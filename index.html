@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Path Challenge</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <!-- Top Controls -->
+  <div id="top-controls">
+    <button id="home-btn" onclick="showStartScreen()" title="Home">
+      <i class="fas fa-home"></i>
+    </button>
+    <button id="tutorial-btn" onclick="toggleTutorial()" title="How to Play">
+      <i class="fas fa-question"></i>
+    </button>
+  </div>
+
+  <!-- Tutorial Modal -->
+  <div id="tutorial-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeTutorial()">&times;</span>
+      <h3>How to Play</h3>
+      <p>Click direction buttons to build a command sequence. Cube must stay on <strong>white path</strong> and reach <strong>B (red)</strong>. Hit "Start" to run!<br><br>Forward/back OK, but <strong>no leaving path</strong>!</p>
+    </div>
+  </div>
+
+  <!-- Start Screen -->
+  <div id="start-screen" class="screen active">
+    <h1>Code Path Challenge</h1>
+    <p>Guide the cube from A to B using direction commands!</p>
+    <button onclick="startPhase(1)" class="big-button">START PHASE 1</button>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="game-screen" class="screen">
+    <div id="phase-nav">
+      <button id="phase-1-btn" class="phase-btn active" onclick="startPhase(1)">Phase 1</button>
+      <button id="phase-2-btn" class="phase-btn locked" onclick="startPhase(2)">Phase 2 <span>LOCKED</span></button>
+      <button id="phase-3-btn" class="phase-btn locked" onclick="startPhase(3)">Phase 3 <span>LOCKED</span></button>
+    </div>
+
+    <div id="game-row">
+      <!-- Grid -->
+      <div id="game-container">
+        <div id="grid"></div>
+        <div id="cube"></div>
+        <div id="start-point" class="point">A</div>
+        <div id="end-point" class="point">B</div>
+      </div>
+
+      <!-- Controls Panel -->
+      <div id="controls-panel">
+        <div id="controls">
+          <!-- D-Pad layout -->
+          <div class="dir-row"><button onclick="addCommand('up')" class="dir-btn"><i class="fas fa-arrow-up"></i></button></div>
+          <div class="dir-row">
+            <button onclick="addCommand('left')" class="dir-btn"><i class="fas fa-arrow-left"></i></button>
+            <button onclick="addCommand('right')" class="dir-btn"><i class="fas fa-arrow-right"></i></button>
+          </div>
+          <div class="dir-row"><button onclick="addCommand('down')" class="dir-btn"><i class="fas fa-arrow-down"></i></button></div>
+
+          <!-- Action buttons -->
+          <div class="action-row">
+            <button onclick="startGame()" id="start-btn">Start</button>
+            <button onclick="resetGame()">Reset</button>
+          </div>
+
+          <div class="action-row" style="justify-content:center;">
+            <button onclick="addFunctionCommand()" id="function-btn" style="display:none;">F</button>
+          </div>
+        </div>
+
+        <!-- Function Box -->
+        <div id="function-box" style="display:none;">
+          <div style="color:#ffaa00;font-weight:bold;margin-bottom:8px;">
+            FUNCTION (F):
+            <button onclick="clearFunction()" style="float:right;background:#cc0000;color:#fff;border:none;padding:4px 8px;font-size:12px;border-radius:6px;cursor:pointer;">Clear</button>
+          </div>
+          <div id="function-commands"><span style="color:#666">[]</span></div>
+          <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
+            <button onclick="addToFunction('up')" class="dir-btn small"><i class="fas fa-arrow-up"></i></button>
+            <button onclick="addToFunction('down')" class="dir-btn small"><i class="fas fa-arrow-down"></i></button>
+            <button onclick="addToFunction('left')" class="dir-btn small"><i class="fas fa-arrow-left"></i></button>
+            <button onclick="addToFunction('right')" class="dir-btn small"><i class="fas fa-arrow-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command limit text (Phase 3+) -->
+    <div id="command-limit-text" style="color:#ffaa00;font-weight:bold;margin:10px 0;display:none;">
+      You have only <span id="limit-number">4</span> main commands – use FUNCTION (F) wisely!
+    </div>
+
+    <!-- Commands display -->
+    <div id="command-list"></div>
+
+    <!-- Result Modal -->
+    <div id="result-modal" style="display:none;">
+      <h3 id="result-title"></h3>
+      <p id="result-message"></p>
+      <div id="result-buttons">
+        <button onclick="nextPhase()" id="next-btn" class="green-btn">Next Phase →</button>
+        <button onclick="resetGame()" class="green-btn">Play Again</button>
+      </div>
+      <button onclick="closeModal()" class="close-modal">Close</button>
+    </div>
+  </div>
+
+  <script src="core.js"></script>
+  <script src="phases.js"></script>
+</body>
+</html>
