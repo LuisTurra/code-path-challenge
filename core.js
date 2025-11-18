@@ -1,25 +1,26 @@
-const gridSize = 5;
+const gridSize = 6;
 const cellSize = 64;
-let cubePos = {x:0,y:0};
-let endPos = {x:4,y:4};
+// let cubePos = { x: 0, y: 0 };
+// let endPos = { x: 5, y: 5 };
 let commands = [];
 let functionCommands = [];
 let currentPathCoords = [];
-let phaseProgress = {current:1, unlocked:[1]};
+let phaseProgress = { current: 1, unlocked: [4] };
 let isAnimating = false;
 let mainCommandLimit = Infinity;
+let currentFunctionLimit = Infinity;
 let currentPhase = 1;
 let gameStartTime = 0;
 
-function showStartScreen(){
+function showStartScreen() {
   document.getElementById('start-screen').classList.add('active');
   document.getElementById('game-screen').classList.remove('active');
   closeTutorial();
   closePhaseSelection();
 }
 
-function startPhase(id){
-  if(!phaseProgress.unlocked.includes(id)) return;
+function startPhase(id) {
+  if (!phaseProgress.unlocked.includes(id)) return;
   phaseProgress.current = id;
   currentPhase = id;
   document.getElementById('start-screen').classList.remove('active');
@@ -28,21 +29,22 @@ function startPhase(id){
   document.getElementById(`phase-${id}-btn`).classList.add('active');
   document.getElementById('ranking-phase-num').textContent = id;
   initPhase(id);
-  // FIXED: Show basic tutorial for Phase 1, function tutorial for Phase 3
-  if(id === 1) showBasicTutorial();
-  else if(id === 3) showPhase3Tutorial();
+
+  if (id === 1) showBasicTutorial();
+  else if (id === 3) showPhase3Tutorial();
 }
 
-function initPhase(id){
+function initPhase(id) {
   const phase = phases.find(p => p.id === id);
   currentPathCoords = phase.coords;
-  cubePos = phase.startPos || {x:0,y:0};
-  endPos = phase.endPos || phase.coords[phase.coords.length-1];
+  cubePos = phase.startPos || { x: 0, y: 0 };
+  endPos = phase.endPos || phase.coords[phase.coords.length - 1];
   mainCommandLimit = phase.mainCommandLimit || Infinity;
+  currentFunctionLimit = phase.functionCommandLimit || Infinity;
   const hasFunc = !!phase.hasFunction;
   const limitText = document.getElementById('command-limit-text');
   const limitNum = document.getElementById('limit-number');
-  if(phase.mainCommandLimit && phase.mainCommandLimit < Infinity){
+  if (phase.mainCommandLimit && phase.mainCommandLimit < Infinity) {
     limitNum.textContent = phase.mainCommandLimit;
     limitText.style.display = 'block';
   } else {
@@ -55,11 +57,11 @@ function initPhase(id){
   initGame();
 }
 
-function initGame(){
+function initGame() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
-  for(let y = 0; y < gridSize; y++){
-    for(let x = 0; x < gridSize; x++){
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
       const cell = document.createElement('div');
       cell.className = 'grid-cell';
       cell.dataset.x = x;
@@ -80,10 +82,10 @@ function initGame(){
   resetCommands();
 }
 
-function resetCommands(){
+function resetCommands() {
   commands = [];
   functionCommands = [];
-  cubePos = {x:0,y:0};
+  // cubePos = { x: 0, y: 0 };
   document.getElementById('command-list').innerHTML = 'Commands: <span style="color:#666">[]</span>';
   document.getElementById('function-commands').innerHTML = '<span style="color:#666">[]</span>';
   document.getElementById('start-btn').textContent = 'Start';
@@ -92,34 +94,38 @@ function resetCommands(){
   updateFunctionDisplay();
 }
 
-function addCommand(dir){
-  if(isAnimating) return;
-  if(commands.length >= mainCommandLimit){ alert(`Only ${mainCommandLimit} main commands allowed! Use FUNCTION (F)`); return; }
+function addCommand(dir) {
+  if (isAnimating) return;
+  if (commands.length >= mainCommandLimit) { alert(`Only ${mainCommandLimit} main commands allowed! Use FUNCTION (F)`); return; }
   commands.push(dir);
   updateCommandDisplay();
 }
 
-function addFunctionCommand(){
-  if(isAnimating) return;
-  if(commands.length >= mainCommandLimit){ alert('Main command limit reached!'); return; }
+function addFunctionCommand() {
+  if (isAnimating) return;
+  if (commands.length >= mainCommandLimit) { alert('Main command limit reached!'); return; }
   commands.push('F');
   updateCommandDisplay();
 }
 
-function addToFunction(dir){
-  if(isAnimating) return;
+function addToFunction(dir) {
+  if (isAnimating) return;
+  if (functionCommands.length >= currentFunctionLimit) {
+    alert(`Only ${currentFunctionLimit} commands allowed in the FUNCTION for Phase ${currentPhase}!`);
+    return;
+  }
   functionCommands.push(dir);
   updateFunctionDisplay();
 }
 
-function clearFunction(){
+function clearFunction() {
   functionCommands = [];
   updateFunctionDisplay();
 }
 
-function updateCommandDisplay(){
+function updateCommandDisplay() {
   const list = document.getElementById('command-list');
-  if(commands.length === 0){ list.innerHTML = 'Commands: <span style="color:#666">[]</span>'; return; }
+  if (commands.length === 0) { list.innerHTML = 'Commands: <span style="color:#666">[]</span>'; return; }
   list.innerHTML = 'Commands: ';
   commands.forEach(c => {
     const icon = document.createElement('span');
@@ -129,9 +135,9 @@ function updateCommandDisplay(){
   });
 }
 
-function updateFunctionDisplay(){
+function updateFunctionDisplay() {
   const box = document.getElementById('function-commands');
-  if(functionCommands.length === 0){ box.innerHTML = '<span style="color:#666">[]</span>'; return; }
+  if (functionCommands.length === 0) { box.innerHTML = '<span style="color:#666">[]</span>'; return; }
   box.innerHTML = '';
   functionCommands.forEach(dir => {
     const icon = document.createElement('span');
@@ -141,40 +147,45 @@ function updateFunctionDisplay(){
   });
 }
 
-function getDirectionIcon(d){
-  const icons = {'up':'<i class="fas fa-arrow-up"></i>','down':'<i class="fas fa-arrow-down"></i>','left':'<i class="fas fa-arrow-left"></i>','right':'<i class="fas fa-arrow-right"></i>'};
+function getDirectionIcon(d) {
+  const icons = { 'up': '<i class="fas fa-arrow-up"></i>', 'down': '<i class="fas fa-arrow-down"></i>', 'left': '<i class="fas fa-arrow-left"></i>', 'right': '<i class="fas fa-arrow-right"></i>' };
   return icons[d] || '';
 }
 
-function startGame(){
-  if(commands.length === 0 || isAnimating) return;
+function startGame() {
+  if (commands.length === 0 || isAnimating) return;
   isAnimating = true;
   gameStartTime = Date.now();
   document.getElementById('start-btn').textContent = 'Running...';
-  let pos = {x:0,y:0};
+  let pos = { ...cubePos };
   let step = 0;
-  function exec(){
-    if(step >= commands.length){ checkWin(pos); return; }
+  function exec() {
+    if (step >= commands.length) { checkWin(pos); return; }
     const cmd = commands[step];
-    if(cmd === 'F'){
+    if (cmd === 'F') {
       let fi = 0;
-      function runF(){
-        if(fi >= functionCommands.length){ step++; setTimeout(exec,400); return; }
-        move(functionCommands[fi], () => { fi++; setTimeout(runF,400); });
+      function runF() {
+        if (fi >= functionCommands.length) { step++; setTimeout(exec, 400); return; }
+        move(functionCommands[fi], () => { fi++; setTimeout(runF, 400); });
       }
       runF();
     } else {
-      move(cmd, () => { step++; setTimeout(exec,400); });
+      move(cmd, () => { step++; setTimeout(exec, 400); });
     }
   }
-  function move(c, cb){
-    let np = {...pos};
-    if(c === 'up' && pos.y > 0) np.y--;
-    if(c === 'down' && pos.y < gridSize - 1) np.y++;
-    if(c === 'left' && pos.x > 0) np.x--;
-    if(c === 'right' && pos.x < gridSize - 1) np.x++;
+  function move(c, cb) {
+    let np = { ...pos };
+    if (c === 'up' && pos.y > 0) np.y--;
+    if (c === 'down' && pos.y < gridSize - 1) np.y++;
+    if (c === 'left' && pos.x > 0) np.x--;
+    if (c === 'right' && pos.x < gridSize - 1) np.x++;
     const onPath = currentPathCoords.some(p => p.x === np.x && p.y === np.y);
-    if(!onPath){ showFail('Cube left the path!'); return; }
+
+    if (!onPath) {
+      console.error(`Failed at position: x=${np.x}, y=${np.y}. Not on path!`);
+      showFail('Cube left the path!');
+      return; // Fails if not on any part of the path
+    }
     pos = np;
     document.getElementById('cube').style.left = `${pos.x * cellSize + 4}px`;
     document.getElementById('cube').style.top = `${pos.y * cellSize + 4}px`;
@@ -184,21 +195,22 @@ function startGame(){
   exec();
 }
 
-function checkWin(p){ if(p.x === endPos.x && p.y === endPos.y) showWin(); else showFail('Did not reach B!'); }
+function checkWin(p) { if (p.x === endPos.x && p.y === endPos.y) showWin(); else showFail('Did not reach B!'); }
 
-function showWin(){
+function showWin() {
   isAnimating = false;
   const timeTaken = ((Date.now() - gameStartTime) / 1000).toFixed(1);
   const phase = phaseProgress.current;
-  
-  // FIXED: Calculate total commands (main + expanded functions for Phase 3+)
+
+
   let cmdCount = commands.length;
   const hasFunc = phases.find(p => p.id === phase).hasFunction;
   if (hasFunc) {
+    const nonFuncCommands = commands.filter(c => c !== 'F').length;
     const numF = commands.filter(c => c === 'F').length;
-    cmdCount = commands.length - numF + (numF * functionCommands.length);  // Main non-F + expanded F steps
+    const funcLength = functionCommands.length;
+    cmdCount = commands.length + funcLength;
   }
-
   const playerName = prompt(
     `PHASE ${phase} COMPLETED!\n${cmdCount} total commands – ${timeTaken}s\n\nEnter your name for GLOBAL leaderboard:`,
     "Player"
@@ -206,16 +218,16 @@ function showWin(){
 
   if (playerName && playerName.trim()) {
     const name = playerName.trim().substring(0, 15);
-    
+
     db.collection("leaderboard").add({
       phase: phase,
       name: name,
-      commands: cmdCount,  // FIXED: Total for Phase 3+
+      commands: cmdCount,
       time: parseFloat(timeTaken),
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     })
-    .then(() => console.log("Global score saved!"))
-    .catch(err => console.error("Save failed:", err));
+      .then(() => console.log("Global score saved!"))
+      .catch(err => console.error("Save failed:", err));
   }
 
   document.getElementById('result-title').textContent = 'Phase Complete!';
@@ -226,36 +238,36 @@ function showWin(){
   document.getElementById('next-btn').style.display = 'inline-block';
 
   const next = phaseProgress.current + 1;
-  if (!phaseProgress.unlocked.includes(next) && phases[next-1]) {
+  if (!phaseProgress.unlocked.includes(next) && phases[next - 1]) {
     phaseProgress.unlocked.push(next);
     document.getElementById(`phase-${next}-btn`)?.classList.remove('locked');
   }
   document.getElementById('result-modal').style.display = 'block';
 }
 
-function showFail(msg){
+function showFail(msg) {
   isAnimating = false;
   document.getElementById('result-title').textContent = 'Failed';
   document.getElementById('result-message').textContent = msg;
-  document.getElementById('next-btn').style.display = 'none';  // Hidden on fail
+  document.getElementById('next-btn').style.display = 'none';
   document.getElementById('result-modal').style.display = 'block';
 }
 
-function nextPhase(){
+function nextPhase() {
   closeModal();
   startPhase(phaseProgress.current + 1);
 }
 
-function resetGame(){
+function resetGame() {
   resetCommands();
   initGame();
 }
 
-function closeModal(){
+function closeModal() {
   document.getElementById('result-modal').style.display = 'none';
 }
 
-function showBasicTutorial(){
+function showBasicTutorial() {
   document.querySelector('#tutorial-modal .modal-content').innerHTML = `
     <span class="close" onclick="closeTutorial()">&times;</span>
     <h3>How to Play</h3>
@@ -264,20 +276,20 @@ function showBasicTutorial(){
   showTutorial();
 }
 
-function showTutorial(){
+function showTutorial() {
   document.getElementById('tutorial-modal').style.display = 'block';
 }
 
-function toggleTutorial(){
+function toggleTutorial() {
   const m = document.getElementById('tutorial-modal');
   m.style.display = m.style.display === 'block' ? 'none' : 'block';
 }
 
-function closeTutorial(){
+function closeTutorial() {
   document.getElementById('tutorial-modal').style.display = 'none';
 }
 
-function showPhase3Tutorial(){
+function showPhase3Tutorial() {
   document.querySelector('#tutorial-modal .modal-content').innerHTML = `
     <span class="close" onclick="closeTutorial()">&times;</span>
     <h3>New: FUNCTION (F)</h3>
@@ -292,14 +304,14 @@ function showPhase3Tutorial(){
 }
 
 // Phase Selection
-function showPhaseSelection(){
+function showPhaseSelection() {
   const buttons = document.getElementById('phase-selection-buttons');
   buttons.innerHTML = '';
   phases.forEach(phase => {
     const btn = document.createElement('button');
     btn.className = 'start-phase-btn' + (phaseProgress.unlocked.includes(phase.id) ? ' unlocked' : ' locked');
     btn.innerHTML = `
-      <img src="phase${phase.id}.png" alt="Phase ${phase.id}" onerror="this.src='placeholder.png';">
+      <img src="images/phase${phase.id}.png" alt="Phase ${phase.id}" onerror="this.src='placeholder.png';">
       <span>Phase ${phase.id}</span>
     `;
     if (phaseProgress.unlocked.includes(phase.id)) {
@@ -313,12 +325,12 @@ function showPhaseSelection(){
   document.getElementById('phase-selection-modal').style.display = 'block';
 }
 
-function closePhaseSelection(){
+function closePhaseSelection() {
   document.getElementById('phase-selection-modal').style.display = 'none';
 }
 
 // Global Rankings (All Phases)
-function showGlobalRankings(){
+function showGlobalRankings() {
   const modal = document.createElement('div');
   modal.className = 'modal';
   modal.style.display = 'block';
@@ -357,7 +369,7 @@ function showRanking(phase) {
       let html = "";
       snapshot.forEach((doc, i) => {
         const r = doc.data();
-        const medal = i === 0 ? "🥇 " : i === 1 ? "🥈 " : i === 2 ? "🥉 " : `${i+1}. `;
+        const medal = i === 0 ? "🥇 " : i === 1 ? "🥈 " : i === 2 ? "🥉 " : `${i + 1}. `;
         html += `${medal}<strong>${r.name.padEnd(15)}</strong> → ${r.commands} cmds | ${r.time}s<br>`;
       });
       list.innerHTML = html;
@@ -366,7 +378,7 @@ function showRanking(phase) {
       console.error("Ranking load error:", err);
       list.innerHTML = "Error loading rankings. Check internet and try again!";
     });
-  
+
   if (document.getElementById('ranking-modal')) document.getElementById('ranking-modal').style.display = 'block';
 }
 
