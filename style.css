@@ -425,11 +425,10 @@ button[onclick="resetGame()"]:hover,
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('your-background.jpg');
-    /* Add your image here later */
+    background-image: url('images/bg.png');
     background-size: cover;
     opacity: 0.8;
-    /* Adjust for transparency */
+
     z-index: -1;
 }
 
@@ -443,7 +442,6 @@ button[onclick="resetGame()"]:hover,
 
 .start-phase-btn {
     background: gray;
-    /* Locked */
     border: none;
     border-radius: 12px;
     cursor: pointer;
@@ -456,7 +454,7 @@ button[onclick="resetGame()"]:hover,
 
 .start-phase-btn.unlocked {
     background: #003087;
-    /* Blue for unlocked */
+    
 }
 
 .start-phase-btn img {

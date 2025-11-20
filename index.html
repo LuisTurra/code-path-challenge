@@ -8,14 +8,14 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Firebase SDK -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 
 <body>
 
-    <!-- Top Controls -->
+    <!-- Controls -->
     <div id="top-controls">
         <button id="home-btn" onclick="showStartScreen()" title="Home">
             <i class="fas fa-home"></i>
@@ -25,7 +25,7 @@
         </button>
     </div>
 
-    <!-- Tutorial Modal -->
+    <!-- Tutorial  -->
     <div id="tutorial-modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeTutorial()">&times;</span>
@@ -36,13 +36,13 @@
         </div>
     </div>
 
-    <!-- Start Screen (Menu) -->
+    <!-- Start Screen  -->
     <div id="start-screen" class="screen active">
-        <div id="start-background"></div> <!-- Add background image in CSS -->
+        <div id="start-background"></div> <!--background -->
         <h1>Code Path Challenge</h1>
         <p>Guide the cube from A to B using direction commands!</p>
 
-        <!-- Menu Buttons (Stacked Green) -->
+        <!-- Menu Buttons  -->
         <div id="start-menu-buttons" class="menu-buttons-stack">
             <button onclick="startPhase(1)" class="menu-btn green-btn">▶ Start (Phase 1)</button>
             <button onclick="showPhaseSelection()" class="menu-btn green-btn">Phases</button>
@@ -56,7 +56,7 @@
             <span class="close" onclick="closePhaseSelection()">&times;</span>
             <h2>Select Phase</h2>
             <div id="phase-selection-buttons">
-                <!-- Auto-generated -->
+                
             </div>
             <button onclick="closePhaseSelection()" class="green-btn">Back to Menu</button>
         </div>
@@ -72,6 +72,12 @@
                 <span>LOCKED</span></button>
             <button id="phase-4-btn" class="phase-btn locked" onclick="startPhase(4)">Phase 4
                 <span>LOCKED</span></button>
+            <button id="phase-5-btn" class="phase-btn locked" onclick="startPhase(5)">Phase 5
+                <span>LOCKED</span></button>
+            <button id="phase-6-btn" class="phase-btn locked" onclick="startPhase(6)">Phase 6
+                <span>LOCKED</span></button>
+            <button id="phase-7-btn" class="phase-btn locked" onclick="startPhase(7)">Phase 7
+                <span>LOCKED</span></button>
         </div>
 
         <div id="game-row">
@@ -86,7 +92,7 @@
             <!-- Controls Panel -->
             <div id="controls-panel">
                 <div id="controls">
-                    <!-- D-Pad layout -->
+                   
                     <div class="dir-row"><button onclick="addCommand('up')" class="dir-btn"><i
                                 class="fas fa-arrow-up"></i></button></div>
                     <div class="dir-row">
@@ -115,6 +121,9 @@
                         <button onclick="clearFunction()"
                             style="float:right;background:#cc0000;color:#fff;border:none;padding:4px 8px;font-size:12px;border-radius:6px;cursor:pointer;">Clear</button>
                     </div>
+                    <div id="func-limit-text">
+                        You have only <span id="func-limit-number">4</span> function commands
+                    </div>
                     <div id="function-commands"><span style="color:#666">[]</span></div>
                     <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
                         <button onclick="addToFunction('up')" class="dir-btn small"><i
@@ -130,22 +139,21 @@
             </div>
         </div>
 
-        <!-- Command limit text (Phase 3+) -->
+        <!-- Command limit  -->
         <div id="command-limit-text" style="color:#ffaa00;font-weight:bold;margin:10px 0;display:none;">
             You have only <span id="limit-number">4</span> main commands – use FUNCTION (F) wisely!
         </div>
 
-        <!-- Commands display -->
         <div id="command-list"></div>
 
-        <!-- RANKING BUTTON (in-game) -->
+        <!-- Button Ranking -->
         <div style="margin:15px 0;">
             <button onclick="showRanking(currentPhase)" class="green-btn" style="padding:14px 32px;font-size:18px;">
                 View Ranking – Phase <span id="ranking-phase-num">1</span>
             </button>
         </div>
 
-        <!-- Result Modal -->
+        <!-- Result -->
         <div id="result-modal" style="display:none;">
             <div class="modal-content">
                 <span class="close" onclick="closeModal()">&times;</span>
@@ -154,13 +162,13 @@
                 <div id="result-buttons">
                     <button onclick="nextPhase()" id="next-btn" class="green-btn">Next Phase →</button>
                     <button onclick="resetGame(); closeModal();" class="green-btn">Play Again</button>
-                    <!-- FIXED: Resets + closes -->
+
                 </div>
-                <!-- REMOVED separate Close – now Play Again does it -->
+
             </div>
         </div>
 
-        <!-- RANKING MODAL -->
+        <!-- RANKING  -->
         <div id="ranking-modal" class="modal" style="display:none;">
             <div class="modal-content">
                 <span class="close"
@@ -172,19 +180,18 @@
             </div>
         </div>
 
-        <!-- Phase Selection Modal -->
+        <!-- Phase Selection -->
         <div id="phase-selection-modal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closePhaseSelection()">&times;</span>
                 <h2>Select Phase</h2>
                 <div id="phase-selection-buttons">
-                    <!-- Auto-generated -->
                 </div>
                 <button onclick="closePhaseSelection()" class="green-btn">Back to Menu</button>
             </div>
         </div>
 
-        <!-- Firebase Initialization -->
+        <!-- Firebase -->
         <script>
             const firebaseConfig = {
                 apiKey: "AIzaSyAmUw8vy-bIe4zw70o-vLbWGdti9FKVsYE",

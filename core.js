@@ -5,7 +5,7 @@ const cellSize = 64;
 let commands = [];
 let functionCommands = [];
 let currentPathCoords = [];
-let phaseProgress = { current: 1, unlocked: [4] };
+let phaseProgress = { current: 1, unlocked: [1] };
 let isAnimating = false;
 let mainCommandLimit = Infinity;
 let currentFunctionLimit = Infinity;
@@ -40,16 +40,24 @@ function initPhase(id) {
   cubePos = phase.startPos || { x: 0, y: 0 };
   endPos = phase.endPos || phase.coords[phase.coords.length - 1];
   mainCommandLimit = phase.mainCommandLimit || Infinity;
-  currentFunctionLimit = phase.functionCommandLimit || Infinity;
+  functionCommandLimit = phase.functionCommandLimit || Infinity;
   const hasFunc = !!phase.hasFunction;
   const limitText = document.getElementById('command-limit-text');
   const limitNum = document.getElementById('limit-number');
-  if (phase.mainCommandLimit && phase.mainCommandLimit < Infinity) {
+  const funclimitText = document.getElementById('func-limit-text');
+  const funclimitNum = document.getElementById('func-limit-number');
+  if (phase.mainCommandLimit && phase.mainCommandLimit < Infinity && phase.functionCommandLimit && phase.functionCommandLimit < Infinity) {
     limitNum.textContent = phase.mainCommandLimit;
     limitText.style.display = 'block';
-  } else {
-    limitText.style.display = 'none';
+
+    funclimitNum.textContent = phase.functionCommandLimit;
+    funclimitText.style.display = 'block';
   }
+  else {
+    limitText.style.display = 'none';
+    funclimitText.style.display = 'none';
+  }
+  
   document.getElementById('function-btn').style.display = hasFunc ? 'inline-block' : 'none';
   document.getElementById('function-box').style.display = hasFunc ? 'block' : 'none';
   functionCommands = [];
@@ -104,14 +112,14 @@ function addCommand(dir) {
 function addFunctionCommand() {
   if (isAnimating) return;
   if (commands.length >= mainCommandLimit) { alert('Main command limit reached!'); return; }
-  commands.push('F');
+  commands.push("F");
   updateCommandDisplay();
 }
 
 function addToFunction(dir) {
   if (isAnimating) return;
-  if (functionCommands.length >= currentFunctionLimit) {
-    alert(`Only ${currentFunctionLimit} commands allowed in the FUNCTION for Phase ${currentPhase}!`);
+  if (functionCommands.length >= functionCommandLimit) {
+    alert(`Only ${functionCommandLimit} commands allowed in the FUNCTION for Phase ${currentPhase}!`);
     return;
   }
   functionCommands.push(dir);
@@ -184,7 +192,7 @@ function startGame() {
     if (!onPath) {
       console.error(`Failed at position: x=${np.x}, y=${np.y}. Not on path!`);
       showFail('Cube left the path!');
-      return; // Fails if not on any part of the path
+      return;
     }
     pos = np;
     document.getElementById('cube').style.left = `${pos.x * cellSize + 4}px`;
@@ -329,7 +337,7 @@ function closePhaseSelection() {
   document.getElementById('phase-selection-modal').style.display = 'none';
 }
 
-// Global Rankings (All Phases)
+// Global Rankings 
 function showGlobalRankings() {
   const modal = document.createElement('div');
   modal.className = 'modal';
@@ -349,7 +357,7 @@ function showGlobalRankings() {
   showRanking(phases[0].id);
 }
 
-// FIXED Ranking Function
+//Ranking Function
 function showRanking(phase) {
   const listId = document.getElementById('ranking-modal') ? 'ranking-list' : 'global-ranking-list';
   const list = document.getElementById(listId);
