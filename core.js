@@ -4,8 +4,9 @@ const cellSize = 64;
 // let endPos = { x: 5, y: 5 };
 let commands = [];
 let functionCommands = [];
+let function2Commands = [];
 let currentPathCoords = [];
-let phaseProgress = { current: 1, unlocked: [1,2,3,4,5,6,7] };
+let phaseProgress = { current: 1, unlocked: [1, 2, 3, 4, 5, 6, 7] };
 let isAnimating = false;
 let mainCommandLimit = Infinity;
 let currentFunctionLimit = Infinity;
@@ -41,27 +42,39 @@ function initPhase(id) {
   endPos = phase.endPos || phase.coords[phase.coords.length - 1];
   mainCommandLimit = phase.mainCommandLimit || Infinity;
   functionCommandLimit = phase.functionCommandLimit || Infinity;
+  function2CommandLimit = phase.function2CommandLimit || Infinity;
   const hasFunc = !!phase.hasFunction;
+  const hasFunc2 = !!phase.hasFunction2;
   const limitText = document.getElementById('command-limit-text');
   const limitNum = document.getElementById('limit-number');
   const funclimitText = document.getElementById('func-limit-text');
   const funclimitNum = document.getElementById('func-limit-number');
-  if (phase.mainCommandLimit && phase.mainCommandLimit < Infinity && phase.functionCommandLimit && phase.functionCommandLimit < Infinity) {
+  const func2limitText = document.getElementById('func2-limit-text');
+  const func2limitNum = document.getElementById('func2-limit-number');
+  if (phase.mainCommandLimit && phase.mainCommandLimit < Infinity && phase.functionCommandLimit && phase.functionCommandLimit < Infinity && phase.function2CommandLimit && phase.function2CommandLimit < Infinity) {
     limitNum.textContent = phase.mainCommandLimit;
     limitText.style.display = 'block';
 
     funclimitNum.textContent = phase.functionCommandLimit;
     funclimitText.style.display = 'block';
+
+    func2limitNum.textContent = phase.function2CommandLimit;
+    func2limitText.style.display = 'block';
   }
   else {
     limitText.style.display = 'none';
     funclimitText.style.display = 'none';
+    func2limitText.style.display = 'none';
   }
-  
+
   document.getElementById('function-btn').style.display = hasFunc ? 'inline-block' : 'none';
   document.getElementById('function-box').style.display = hasFunc ? 'block' : 'none';
+  document.getElementById('function2-btn').style.display = hasFunc2 ? 'inline-block' : 'none';
+  document.getElementById('function2-box').style.display = hasFunc2 ? 'block' : 'none';
   functionCommands = [];
+  function2Commands = [];
   updateFunctionDisplay();
+
   initGame();
 }
 
@@ -93,13 +106,16 @@ function initGame() {
 function resetCommands() {
   commands = [];
   functionCommands = [];
+  function2Commands = [];
   // cubePos = { x: 0, y: 0 };
   document.getElementById('command-list').innerHTML = 'Commands: <span style="color:#666">[]</span>';
   document.getElementById('function-commands').innerHTML = '<span style="color:#666">[]</span>';
+  document.getElementById('function2-commands').innerHTML = '<span style="color:#666">[]</span>';
   document.getElementById('start-btn').textContent = 'Start';
   isAnimating = false;
   document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('visited'));
   updateFunctionDisplay();
+
 }
 
 function addCommand(dir) {
@@ -115,7 +131,12 @@ function addFunctionCommand() {
   commands.push("F");
   updateCommandDisplay();
 }
-
+function addFunction2Command() {
+  if (isAnimating) return;
+  if (commands.length >= mainCommandLimit) { alert('Main command limit reached!'); return; }
+  commands.push("F2");
+  updateCommandDisplay();
+}
 function addToFunction(dir) {
   if (isAnimating) return;
   if (functionCommands.length >= functionCommandLimit) {
@@ -125,34 +146,75 @@ function addToFunction(dir) {
   functionCommands.push(dir);
   updateFunctionDisplay();
 }
-
+function addToFunction2(dir) {
+  if (isAnimating) return;
+  if (function2Commands.length >= function2CommandLimit) {
+    alert(`Only ${function2CommandLimit} commands allowed in the FUNCTION for Phase ${currentPhase}!`);
+    return;
+  }
+  function2Commands.push(dir);
+  updateFunctionDisplay();
+}
 function clearFunction() {
   functionCommands = [];
   updateFunctionDisplay();
 }
-
+function clearFunction2() {
+  function2Commands = [];
+  updateFunctionDisplay();
+}
 function updateCommandDisplay() {
   const list = document.getElementById('command-list');
-  if (commands.length === 0) { list.innerHTML = 'Commands: <span style="color:#666">[]</span>'; return; }
-  list.innerHTML = 'Commands: ';
+  list.innerHTML = '';
+  list.textContent = 'Commands: ';
+  if (commands.length === 0) {
+    const emptySpan = document.createElement('span');
+    emptySpan.style.color = '#666';
+    emptySpan.textContent = '[]';
+    list.appendChild(emptySpan);
+    return;
+  }
   commands.forEach(c => {
     const icon = document.createElement('span');
-    icon.className = 'cmd-icon' + (c === 'F' ? ' function-icon' : '');
-    icon.innerHTML = c === 'F' ? '<i class="fas fa-cogs"></i>' : getDirectionIcon(c);
+    icon.classList.add('cmd-icon');
+    if (c === 'F') {
+      icon.classList.add('function-icon');
+      icon.innerHTML = '<i class="fas fa-cogs">1</i>';
+    } else if (c === 'F2') {
+      icon.classList.add('function-icon');
+      icon.innerHTML = '<i class="fas fa-cogs">2</i>';
+    } else {
+      icon.innerHTML = getDirectionIcon(c);
+    }
     list.appendChild(icon);
   });
 }
 
 function updateFunctionDisplay() {
   const box = document.getElementById('function-commands');
-  if (functionCommands.length === 0) { box.innerHTML = '<span style="color:#666">[]</span>'; return; }
-  box.innerHTML = '';
-  functionCommands.forEach(dir => {
-    const icon = document.createElement('span');
-    icon.className = 'cmd-icon function-icon';
-    icon.innerHTML = getDirectionIcon(dir);
-    box.appendChild(icon);
-  });
+  const box2 = document.getElementById('function2-commands');
+  if (functionCommands.length === 0) {
+    box.innerHTML = '<span style="color:#666">[]</span>';
+  } else {
+    box.innerHTML = '';
+    functionCommands.forEach(dir => {
+      const icon = document.createElement('span');
+      icon.className = 'cmd-icon function-icon';
+      icon.innerHTML = getDirectionIcon(dir);
+      box.appendChild(icon);
+    });
+  }
+  if (function2Commands.length === 0) {
+    box2.innerHTML = '<span style="color:#666">[]</span>';
+  } else {
+    box2.innerHTML = '';
+    function2Commands.forEach(dir => {
+      const icon = document.createElement('span');
+      icon.className = 'cmd-icon function-icon';
+      icon.innerHTML = getDirectionIcon(dir);
+      box2.appendChild(icon);
+    });
+  }
 }
 
 function getDirectionIcon(d) {
@@ -168,17 +230,45 @@ function startGame() {
   let pos = { ...cubePos };
   let step = 0;
   function exec() {
-    if (step >= commands.length) { checkWin(pos); return; }
+    if (step >= commands.length) {
+      checkWin(pos);
+      return;
+    }
     const cmd = commands[step];
+
     if (cmd === 'F') {
       let fi = 0;
       function runF() {
-        if (fi >= functionCommands.length) { step++; setTimeout(exec, 400); return; }
-        move(functionCommands[fi], () => { fi++; setTimeout(runF, 400); });
+        if (fi >= functionCommands.length) {
+          step++;
+          setTimeout(exec, 400);
+          return;
+        }
+        move(functionCommands[fi], () => {
+          fi++;
+          setTimeout(runF, 400);
+        });
       }
       runF();
+    } else if (cmd === 'F2') {
+      let f2i = 0;
+      function runF2() {
+        if (f2i >= function2Commands.length) {
+          step++;
+          setTimeout(exec, 400);
+          return;
+        }
+        move(function2Commands[f2i], () => {
+          f2i++;
+          setTimeout(runF2, 400);
+        });
+      }
+      runF2();
     } else {
-      move(cmd, () => { step++; setTimeout(exec, 400); });
+      move(cmd, () => {
+        step++;
+        setTimeout(exec, 400);
+      });
     }
   }
   function move(c, cb) {
@@ -209,15 +299,17 @@ function showWin() {
   isAnimating = false;
   const timeTaken = ((Date.now() - gameStartTime) / 1000).toFixed(1);
   const phase = phaseProgress.current;
-
-
   let cmdCount = commands.length;
   const hasFunc = phases.find(p => p.id === phase).hasFunction;
-  if (hasFunc) {
-    const nonFuncCommands = commands.filter(c => c !== 'F').length;
-    const numF = commands.filter(c => c === 'F').length;
+  const hasFunc2 = phases.find(p => p.id === phase).hasFunction2;
+  if (hasFunc ) {
     const funcLength = functionCommands.length;
     cmdCount = commands.length + funcLength;
+  }else if (hasFunc2){
+    const funcLength = functionCommands.length;
+    const funcLength2 = function2Commands.length;
+    cmdCount = commands.length + funcLength + funcLength2;
+    
   }
   const playerName = prompt(
     `PHASE ${phase} COMPLETED!\n${cmdCount} total commands – ${timeTaken}s\n\nEnter your name for GLOBAL leaderboard:`,
