@@ -20,6 +20,7 @@ const phases = [
     coords: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 2 }, { x: 2, y: 2 }, { x: 2, y: 3 }, { x: 3, y: 3 },
        { x: 3, y: 4 }, { x: 4, y: 4 }, { x: 4, y: 5 }, { x: 5, y: 5 }],
     hasFunction: true,
+    hasFunction2: false,
     mainCommandLimit: 5,
     functionCommandLimit: 20
   },
@@ -33,6 +34,7 @@ const phases = [
       { x: 4, y: 2}, { x: 4, y: 1 }, { x: 3, y: 1 }, { x:5, y: 1 }, { x: 5, y: 0 },{ x: 4, y: 0 }],
       
     hasFunction: true,
+    hasFunction2: false,
     mainCommandLimit: 10,
     functionCommandLimit: 4
   },
@@ -47,7 +49,36 @@ const phases = [
     { x: 1, y: 3}, { x: 1, y: 2 }, { x: 1, y: 1 }, { x:1, y: 0 }, { x: 0, y: 0 }],
       
     hasFunction: true,
+    hasFunction2: false,
     mainCommandLimit: 10,
     functionCommandLimit: 6
+  },
+  {
+    id: 6,
+    startPos: { x: 0, y: 3 },
+    endPos: { x: 5, y: 3 },
+    coords: [
+      { x: 0, y: 2 }, { x: 1, y:2 }, { x: 2, y: 2 }, { x: 3, y: 2 }, { x:4, y: 2 }, 
+      { x: 5, y: 2 }, { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 3, y: 3 }, 
+      { x: 4, y: 3}, { x: 5, y: 3 }],
+      
+    hasFunction: true,
+    hasFunction2: false,
+    mainCommandLimit: 3,
+    functionCommandLimit: 4
+  },
+  {
+    id: 7,
+    startPos: { x: 0, y: 3 },
+    endPos: { x: 5, y: 3 },
+    coords: [
+      { x: 0, y: 2 }, { x: 1, y:2 }, { x: 2, y: 2 }, { x: 3, y: 2 }, { x:4, y: 2 }, 
+      { x: 5, y: 2 }, { x: 0, y: 3 }, { x: 1, y: 3 }, { x: 2, y: 3 }, { x: 3, y: 3 }, 
+      { x: 4, y: 3}, { x: 5, y: 3 }],
+      
+    hasFunction: true,
+    hasFunction2: true,
+    mainCommandLimit: 3,
+    functionCommandLimit: 4
   }
 ];
