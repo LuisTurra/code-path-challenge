@@ -82,12 +82,16 @@
 
         <div id="game-row">
             <!-- Grid -->
-            <div id="game-container">
-                <div id="grid"></div>
-                <div id="cube"></div>
-                <div id="start-point" class="point">A</div>
-                <div id="end-point" class="point">B</div>
-            </div>
+            <div class="grid-outer">
+    <div class="grid-inner">
+        <div id="game-container">
+            <div id="grid"></div>
+            <div id="cube"></div>
+            <div id="start-point" class="point">A</div>
+            <div id="end-point" class="point">B</div>
+        </div>
+    </div>
+</div>
 
             <!-- Controls Panel -->
             <div id="controls-panel">
@@ -118,52 +122,52 @@
                 </div>
 
                 <!-- Function Box -->
-                <div id="function-box" style="display:none;">
-                    <div style="color:#ffaa00;font-weight:bold;margin-bottom:8px;">
-                        FUNCTION (F1):
-                        <button onclick="clearFunction()"
-                            style="float:right;background:#cc0000;color:#fff;border:none;padding:4px 8px;font-size:12px;border-radius:6px;cursor:pointer;">Clear</button>
-                    </div>
-                    <div id="func-limit-text">
-                        You have only <span id="func-limit-number">4</span> function commands
-                    </div>
-                    <div id="function-commands"><span style="color:#666">[]</span></div>
-                    <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
-                        <button onclick="addToFunction('up')" class="dir-btn small"><i
-                                class="fas fa-arrow-up"></i></button>
-                        <button onclick="addToFunction('down')" class="dir-btn small"><i
-                                class="fas fa-arrow-down"></i></button>
-                        <button onclick="addToFunction('left')" class="dir-btn small"><i
-                                class="fas fa-arrow-left"></i></button>
-                        <button onclick="addToFunction('right')" class="dir-btn small"><i
-                                class="fas fa-arrow-right"></i></button>
-                    </div>
 
+
+            </div>
+            <div id="function-box" style="display:none;">
+                <div style="color:#ffaa00;font-weight:bold;margin-bottom:8px;">
+                    FUNCTION (F1):
+                    <button onclick="clearFunction()"
+                        style="float:right;background:#cc0000;color:#fff;border:none;padding:4px 8px;font-size:12px;border-radius:6px;cursor:pointer;">Clear</button>
                 </div>
-                <!-- Function 2 Box -->
-                <div id="function2-box" style="display:none;">
-                    <div style="color:#ffaa00;font-weight:bold;margin-bottom:8px;">
-                        FUNCTION 2 (F2):
-                        <button onclick="clearFunction2()"
-                            style="float:right;background:#cc0000;color:#fff;border:none;padding:4px 8px;font-size:12px;border-radius:6px;cursor:pointer;">Clear</button>
-                    </div>
-                    <div id="func2-limit-text">
-                        You have only <span id="func2-limit-number">4</span> function commands
-                    </div>
-                    <div id="function2-commands"><span style="color:#666">[]</span></div>
-                    <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
-                        <button onclick="addToFunction2('up')" class="dir-btn small"><i
-                                class="fas fa-arrow-up"></i></button>
-                        <button onclick="addToFunction2('down')" class="dir-btn small"><i
-                                class="fas fa-arrow-down"></i></button>
-                        <button onclick="addToFunction2('left')" class="dir-btn small"><i
-                                class="fas fa-arrow-left"></i></button>
-                        <button onclick="addToFunction2('right')" class="dir-btn small"><i
-                                class="fas fa-arrow-right"></i></button>
-                    </div>
+                <div id="func-limit-text">
+                    You have only <span id="func-limit-number">4</span> function commands
+                </div>
+                <div id="function-commands"><span style="color:#666">[]</span></div>
+                <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
+                    <button onclick="addToFunction('up')" class="dir-btn small"><i class="fas fa-arrow-up"></i></button>
+                    <button onclick="addToFunction('down')" class="dir-btn small"><i
+                            class="fas fa-arrow-down"></i></button>
+                    <button onclick="addToFunction('left')" class="dir-btn small"><i
+                            class="fas fa-arrow-left"></i></button>
+                    <button onclick="addToFunction('right')" class="dir-btn small"><i
+                            class="fas fa-arrow-right"></i></button>
+                </div>
+
+            </div>
+            <!-- Function 2 Box -->
+            <div id="function2-box" style="display:none;">
+                <div style="color:#ffaa00;font-weight:bold;margin-bottom:8px;">
+                    FUNCTION 2 (F2):
+                    <button onclick="clearFunction2()"
+                        style="float:right;background:#cc0000;color:#fff;border:none;padding:4px 8px;font-size:12px;border-radius:6px;cursor:pointer;">Clear</button>
+                </div>
+                <div id="func2-limit-text">
+                    You have only <span id="func2-limit-number">4</span> function commands
+                </div>
+                <div id="function2-commands"><span style="color:#666">[]</span></div>
+                <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
+                    <button onclick="addToFunction2('up')" class="dir-btn small"><i
+                            class="fas fa-arrow-up"></i></button>
+                    <button onclick="addToFunction2('down')" class="dir-btn small"><i
+                            class="fas fa-arrow-down"></i></button>
+                    <button onclick="addToFunction2('left')" class="dir-btn small"><i
+                            class="fas fa-arrow-left"></i></button>
+                    <button onclick="addToFunction2('right')" class="dir-btn small"><i
+                            class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
-
         </div>
 
         <!-- Command limit  -->

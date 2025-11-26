@@ -9,10 +9,12 @@
 html,
 body {
     height: 100dvh;
-    overflow: hidden;
+    overflow-x: auto;
     font-family: 'Montserrat', sans-serif;
     background: #1a1a1a;
     color: #fff;
+    padding: 0;
+    margin: 0;
 }
 
 #top-controls {
@@ -127,6 +129,7 @@ body {
     max-width: 90vw;
     flex-wrap: wrap;
     justify-content: center;
+
 }
 
 #game-container {
@@ -311,6 +314,7 @@ button[onclick="resetGame()"]:hover,
     padding: 12px 20px;
     font-size: 16px;
 }
+
 #function2-btn {
     background: linear-gradient(45deg, #ff6b00, #ffaa00) !important;
     color: #000 !important;
@@ -338,6 +342,7 @@ button[onclick="resetGame()"]:hover,
     background: #111;
     border-radius: 8px;
 }
+
 #function2-box {
     background: #1a1a1a;
     padding: 12px;
@@ -357,6 +362,7 @@ button[onclick="resetGame()"]:hover,
     background: #111;
     border-radius: 8px;
 }
+
 #command-list {
     min-height: 50px;
     max-height: 50px;
@@ -479,7 +485,7 @@ button[onclick="resetGame()"]:hover,
 
 .start-phase-btn.unlocked {
     background: #003087;
-    
+
 }
 
 .start-phase-btn img {
@@ -505,25 +511,52 @@ button[onclick="resetGame()"]:hover,
     cursor: not-allowed;
 }
 
-@media (max-width:700px) {
-    #game-row {
-        flex-direction: column;
-        gap: 15px;
+@media (max-width: 768px) {
+    
+    /* Ensure the grid's immediate container is wide enough */
+    .grid-outer {
+        /* This padding adds the desired 12px safe space */
+        padding: 0 12px;
+        /* CRITICAL: Must allow horizontal scrolling on the outer container */
+        overflow-x: auto; 
+        overflow-y: hidden;
+        /* The rest of the styles below ensure the grid is fixed size */
+        width: 100vw;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+
+    /* Inner Container */
+    .grid-inner {
+        /* CRITICAL: Forces the container to be the fixed size */
+        width: 404px !important;
+        margin: 0 auto; 
+        padding: 0;
+        /* If 100vw is < 404px, the margin: auto will center the 404px block
+           and the overflow-x: auto on .grid-outer will provide the scrollbar. */
     }
 
     #game-container {
-        width: 100%;
-        max-width: 360px;
-        height: 360px;
+        /* CRITICAL: Keep fixed size */
+        width: 404px !important;
+        height: 404px !important;
+        flex-shrink: 0;
     }
-
+    
     #grid {
-        grid-template: repeat(5, 70px)/repeat(5, 70px);
+        /* CRITICAL: Keep fixed size and fixed children sizes */
+        width: 404px;
+        height: 404px;
+        grid-template: repeat(6, 64px) / repeat(6, 64px);
+        /* ... (rest of the grid styles) ... */
     }
-
-    .dir-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
+    
+    /* Ensure all inner elements revert to fixed pixel sizes */
+    #cube,
+    .point {
+        width: 56px;
+        height: 56px;
+        border-width: 4px;
+        font-size: 24px;
     }
 }

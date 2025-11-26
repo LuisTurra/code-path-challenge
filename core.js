@@ -1,5 +1,5 @@
 const gridSize = 6;
-const cellSize = 64;
+// const cellSize = 64;
 // let cubePos = { x: 0, y: 0 };
 // let endPos = { x: 5, y: 5 };
 let commands = [];
@@ -12,6 +12,12 @@ let mainCommandLimit = Infinity;
 let currentFunctionLimit = Infinity;
 let currentPhase = 1;
 let gameStartTime = 0;
+
+
+function getScaledCellSize() {
+  const cellElement = document.querySelector('.grid-cell');
+  return cellElement ? cellElement.offsetWidth : 64;
+}
 
 function showStartScreen() {
   document.getElementById('start-screen').classList.add('active');
@@ -93,13 +99,15 @@ function initGame() {
   currentPathCoords.forEach(p => {
     document.querySelector(`.grid-cell[data-x="${p.x}"][data-y="${p.y}"]`).classList.add('path');
   });
+  const currentCellSize = getScaledCellSize();
   const o = 4;
-  document.getElementById('cube').style.left = `${cubePos.x * cellSize + o}px`;
-  document.getElementById('cube').style.top = `${cubePos.y * cellSize + o}px`;
-  document.getElementById('start-point').style.left = `${cubePos.x * cellSize + o}px`;
-  document.getElementById('start-point').style.top = `${cubePos.y * cellSize + o}px`;
-  document.getElementById('end-point').style.left = `${endPos.x * cellSize + o}px`;
-  document.getElementById('end-point').style.top = `${endPos.y * cellSize + o}px`;
+
+  document.getElementById('cube').style.left = `${cubePos.x * currentCellSize + o}px`;
+  document.getElementById('cube').style.top = `${cubePos.y * currentCellSize + o}px`;
+  document.getElementById('start-point').style.left = `${cubePos.x * currentCellSize + o}px`;
+  document.getElementById('start-point').style.top = `${cubePos.y * currentCellSize + o}px`;
+  document.getElementById('end-point').style.left = `${endPos.x * currentCellSize + o}px`;
+  document.getElementById('end-point').style.top = `${endPos.y * currentCellSize + o}px`;
   resetCommands();
 }
 
@@ -271,6 +279,7 @@ function startGame() {
       });
     }
   }
+  const currentCellSize = getScaledCellSize();
   function move(c, cb) {
     let np = { ...pos };
     if (c === 'up' && pos.y > 0) np.y--;
@@ -285,8 +294,9 @@ function startGame() {
       return;
     }
     pos = np;
-    document.getElementById('cube').style.left = `${pos.x * cellSize + 4}px`;
-    document.getElementById('cube').style.top = `${pos.y * cellSize + 4}px`;
+    document.getElementById('cube').style.left = `${pos.x * currentCellSize + 4}px`;
+    document.getElementById('cube').style.top = `${pos.y * currentCellSize + 4}px`;
+
     document.querySelector(`.grid-cell[data-x="${pos.x}"][data-y="${pos.y}"]`).classList.add('visited');
     cb();
   }
@@ -299,20 +309,14 @@ function showWin() {
   isAnimating = false;
   const timeTaken = ((Date.now() - gameStartTime) / 1000).toFixed(1);
   const phase = phaseProgress.current;
-  let cmdCount = commands.length;
-  const hasFunc = phases.find(p => p.id === phase).hasFunction;
-  const hasFunc2 = phases.find(p => p.id === phase).hasFunction2;
-  if (hasFunc ) {
-    const funcLength = functionCommands.length;
-    cmdCount = commands.length + funcLength;
-  }else if (hasFunc2){
-    const funcLength = functionCommands.length;
-    const funcLength2 = function2Commands.length;
-    cmdCount = commands.length + funcLength + funcLength2;
-    
-  }
+  let totalCommands = commands.length;
+  const numFCalls = commands.filter(c => c === "F").length;
+  const numF2Calls = commands.filter(c => c === "F2").length;
+  totalCommands += numFCalls * functionCommands.length;
+  totalCommands += numF2Calls * function2Commands.length;
+
   const playerName = prompt(
-    `PHASE ${phase} COMPLETED!\n${cmdCount} total commands – ${timeTaken}s\n\nEnter your name for GLOBAL leaderboard:`,
+    `PHASE ${phase} COMPLETED!\n${totalCommands} total commands – ${timeTaken}s\n\nEnter your name for GLOBAL leaderboard:`,
     "Player"
   );
 
@@ -322,7 +326,7 @@ function showWin() {
     db.collection("leaderboard").add({
       phase: phase,
       name: name,
-      commands: cmdCount,
+      commands: totalCommands,
       time: parseFloat(timeTaken),
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     })
@@ -332,7 +336,7 @@ function showWin() {
 
   document.getElementById('result-title').textContent = 'Phase Complete!';
   document.getElementById('result-message').innerHTML = `
-    Completed with <strong>${cmdCount}</strong> total commands<br>
+    Completed with <strong>${totalCommands}</strong> total commands<br>
     Time: <strong>${timeTaken}s</strong>
   `;
   document.getElementById('next-btn').style.display = 'inline-block';
@@ -429,57 +433,85 @@ function closePhaseSelection() {
   document.getElementById('phase-selection-modal').style.display = 'none';
 }
 
+ 
 // Global Rankings 
 function showGlobalRankings() {
-  const modal = document.createElement('div');
-  modal.className = 'modal';
-  modal.style.display = 'block';
-  modal.innerHTML = `
-    <div class="modal-content">
-      <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
-      <h2>Global Rankings</h2>
-      <select id="ranking-phase-select" onchange="showRanking(this.value)" style="margin:10px 0;padding:8px;">
-        ${phases.map(p => `<option value="${p.id}">Phase ${p.id}</option>`).join('')}
-      </select>
-      <div id="global-ranking-list" style="margin:20px 0;font-family:monospace;text-align:left;">Loading...</div>
-      <button onclick="this.closest('.modal').remove()" class="green-btn">Close</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  showRanking(phases[0].id);
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'global-rank-container'; 
+    modal.style.display = 'block';
+    const STARTING_PHASE_ID = 1; 
+    modal.innerHTML = `
+      <div class="modal-content">
+        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+        <h2>Global Rankings</h2>
+        <select id="ranking-phase-select" onchange="showRanking(this.value)" style="margin:10px 0;padding:8px;">
+          ${
+            (typeof phases !== 'undefined' && phases.length > 0)
+              ? phases.map(p => `<option value="${p.id}" ${p.id === STARTING_PHASE_ID ? 'selected' : ''}>Phase ${p.id}</option>`).join('')
+              : '<option value="1">Phase 1</option>' 
+          }
+        </select>
+        <div id="global-ranking-list" style="margin:20px 0;font-family:monospace;text-align:left;">Loading...</div>
+        <button onclick="this.closest('.modal').remove()" class="green-btn">Close</button>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    showRanking(STARTING_PHASE_ID);
 }
 
-//Ranking Function
+// Ranking Function
 function showRanking(phase) {
-  const listId = document.getElementById('ranking-modal') ? 'ranking-list' : 'global-ranking-list';
-  const list = document.getElementById(listId);
-  list.innerHTML = 'Loading rankings...';
-
-  db.collection("leaderboard")
-    .where("phase", "==", phase)
-    .orderBy("commands", "asc")
-    .orderBy("time", "asc")
-    .limit(10)
-    .get()
-    .then(snapshot => {
-      if (snapshot.empty) {
-        list.innerHTML = "No records yet!<br>Be the first in the world!";
+    const phaseNum = parseInt(phase, 10); 
+    let listId;
+    
+    if (document.getElementById('global-ranking-list')) {
+        listId = 'global-ranking-list';
+    } else if (document.getElementById('ranking-list')) {
+        listId = 'ranking-list';
+    } else {
+        console.error("No ranking list element found to update!");
         return;
-      }
-      let html = "";
-      snapshot.forEach((doc, i) => {
-        const r = doc.data();
-        const medal = i === 0 ? "🥇 " : i === 1 ? "🥈 " : i === 2 ? "🥉 " : `${i + 1}. `;
-        html += `${medal}<strong>${r.name.padEnd(15)}</strong> → ${r.commands} cmds | ${r.time}s<br>`;
-      });
-      list.innerHTML = html;
-    })
-    .catch(err => {
-      console.error("Ranking load error:", err);
-      list.innerHTML = "Error loading rankings. Check internet and try again!";
-    });
+    }
+    
+    const list = document.getElementById(listId);
+    
+   
+    if (listId === 'ranking-list') {
+        document.getElementById('ranking-modal').style.display = 'block';
+        const titleElement = document.getElementById('ranking-title');
+        if (titleElement) {
+            titleElement.textContent = `PHASE ${phaseNum} RANKING`;
+        }
+    } 
+    
+    list.innerHTML = 'Loading rankings...';
 
-  if (document.getElementById('ranking-modal')) document.getElementById('ranking-modal').style.display = 'block';
+    db.collection("leaderboard")
+      .where("phase", "==", phaseNum)
+      .orderBy("commands", "asc")
+      .orderBy("time", "asc")
+      .limit(10)
+      .get()
+      .then(snapshot => {
+          if (snapshot.empty) {
+              list.innerHTML = "No records yet!<br>Be the first in the world!";
+              return;
+          }
+          let html = "";
+          snapshot.forEach((doc, i) => {
+              const r = doc.data();
+              const medal = i === 0 ? "🥇 " : i === 1 ? "🥈 " : i === 2 ? "🥉 " : `${i + 1}. `;
+              html += `${medal}<strong>${r.name.padEnd(15)}</strong> → ${r.commands} cmds | ${r.time}s<br>`;
+          });
+          list.innerHTML = html;
+      })
+      .catch(err => {
+          console.error("Ranking load error:", err);
+          list.innerHTML = "Error loading rankings. Check internet and try again!";
+      });
 }
 
 window.addEventListener('load', () => {
