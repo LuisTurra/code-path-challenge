@@ -322,7 +322,7 @@ function showWin() {
 
   if (playerName && playerName.trim()) {
     const name = playerName.trim().substring(0, 15);
-
+    localStorage.setItem('playerName', name);
     db.collection("leaderboard").add({
       phase: phase,
       name: name,
@@ -432,88 +432,162 @@ function showPhaseSelection() {
 function closePhaseSelection() {
   document.getElementById('phase-selection-modal').style.display = 'none';
 }
-
- 
-// Global Rankings 
+// 1. GLOBAL RANKINGS BUTTON — NOW WORKS PERFECTLY
 function showGlobalRankings() {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.id = 'global-rank-container'; 
-    modal.style.display = 'block';
-    const STARTING_PHASE_ID = 1; 
-    modal.innerHTML = `
-      <div class="modal-content">
-        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
-        <h2>Global Rankings</h2>
-        <select id="ranking-phase-select" onchange="showRanking(this.value)" style="margin:10px 0;padding:8px;">
-          ${
-            (typeof phases !== 'undefined' && phases.length > 0)
-              ? phases.map(p => `<option value="${p.id}" ${p.id === STARTING_PHASE_ID ? 'selected' : ''}>Phase ${p.id}</option>`).join('')
-              : '<option value="1">Phase 1</option>' 
-          }
-        </select>
-        <div id="global-ranking-list" style="margin:20px 0;font-family:monospace;text-align:left;">Loading...</div>
-        <button onclick="this.closest('.modal').remove()" class="green-btn">Close</button>
-      </div>
+  const existing = document.getElementById('global-rank-container');
+  if (existing) {
+    existing.style.display = 'flex';
+    existing.style.opacity = '0';
+    setTimeout(() => {
+      existing.style.opacity = '1';
+      existing.querySelector('.modal-content').style.transform = 'scale(1)';
+    }, 10);
+    const select = document.getElementById('ranking-phase-select');
+    if (select) showRanking(select.value || 1);
+    return;
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'global-rank-container';
+  modal.className = 'modal';
+  modal.style.cssText = 'display:flex; opacity:0;';
+
+  modal.innerHTML = `
+        <div class="modal-content" style="transform:scale(0.95); transition:all 0.3s;">
+            <span class="close" onclick="this.closest('#global-rank-container').remove()">&times;</span>
+            <h2>Global Rankings</h2>
+            <select id="ranking-phase-select" onchange="showRanking(this.value)" class="phase-select" style="margin:15px 0; padding:10px; font-size:1em; width:100%; max-width:300px;">
+                ${phases.map(p => `<option value="${p.id}" ${p.id === 1 ? 'selected' : ''}>Phase ${p.id}${p.name ? ' – ' + p.name : ''}</option>`).join('')}
+            </select>
+            <div id="global-ranking-list" class="ranking-list"></div>
+            <button onclick="document.getElementById('global-rank-container').remove()" class="green-btn close-btn" style="margin-top:20px;">Close</button>
+        </div>
     `;
 
-    document.body.appendChild(modal);
+  document.body.appendChild(modal);
 
-    showRanking(STARTING_PHASE_ID);
+  // Fade in animation
+  setTimeout(() => {
+    modal.style.opacity = '1';
+    modal.querySelector('.modal-content').style.transform = 'scale(1)';
+  }, 10);
+
+  // Load Phase 1 by default
+  showRanking(1);
 }
 
-// Ranking Function
+
 function showRanking(phase) {
-    const phaseNum = parseInt(phase, 10); 
-    let listId;
-    
-    if (document.getElementById('global-ranking-list')) {
-        listId = 'global-ranking-list';
-    } else if (document.getElementById('ranking-list')) {
-        listId = 'ranking-list';
-    } else {
-        console.error("No ranking list element found to update!");
-        return;
-    }
-    
-    const list = document.getElementById(listId);
-    
-   
-    if (listId === 'ranking-list') {
-        document.getElementById('ranking-modal').style.display = 'block';
-        const titleElement = document.getElementById('ranking-title');
-        if (titleElement) {
-            titleElement.textContent = `PHASE ${phaseNum} RANKING`;
-        }
-    } 
-    
-    list.innerHTML = 'Loading rankings...';
+  const phaseNum = parseInt(phase, 10) || 1;
+  const isGlobal = !!document.getElementById('global-ranking-list');
+  const listId = isGlobal ? 'global-ranking-list' : 'ranking-list';
+  const list = document.getElementById(listId);
+  if (!list) return;
 
-    db.collection("leaderboard")
-      .where("phase", "==", phaseNum)
-      .orderBy("commands", "asc")
-      .orderBy("time", "asc")
-      .limit(10)
-      .get()
-      .then(snapshot => {
-          if (snapshot.empty) {
-              list.innerHTML = "No records yet!<br>Be the first in the world!";
-              return;
+  if (!isGlobal) {
+    const modal = document.getElementById('ranking-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.style.opacity = '0';
+      setTimeout(() => {
+        modal.style.opacity = '1';
+        modal.querySelector('.modal-content').style.transform = 'scale(1)';
+      }, 10);
+      const title = document.getElementById('ranking-title');
+      if (title) title.textContent = `Phase ${phaseNum} Ranking`;
+    }
+  }
+
+  list.innerHTML = '<p class="loading-text">Loading rankings...</p>';
+
+  const myName = (localStorage.getItem('playerName') || '').trim();
+  const oldBox = document.getElementById('your-rank-box');
+  if (oldBox) oldBox.remove();
+
+  db.collection("leaderboard")
+    .where("phase", "==", phaseNum)
+    .orderBy("commands", "asc")
+    .orderBy("time", "asc")
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        list.innerHTML = '<p class="no-records-text">No records yet!<br>Be the first in the world!</p>';
+        return;
+      }
+
+      let yourRank = null;
+      let yourData = null;
+      let html = '<table class="ranking-table"><thead><tr><th>Rank</th><th>Player</th><th>Commands</th><th>Time</th></tr></thead><tbody>';
+
+      snapshot.docs.forEach((doc, i) => {
+        const r = doc.data();
+        const rank = i + 1;
+
+        if (i < 10) {
+          const medal = rank === 1 ? "1st" : rank === 2 ? "2nd" : rank === 3 ? "3rd" : `${rank}.`;
+          const rowClass = `ranking-row ${rank <= 3 ? 'top-row' : ''} ${i % 2 === 0 ? 'even-row' : 'odd-row'}`;
+
+          if (myName && r.name === myName) {
+            yourRank = rank;
+            yourData = r;
           }
-          let html = "";
-          snapshot.forEach((doc, i) => {
-              const r = doc.data();
-              const medal = i === 0 ? "🥇 " : i === 1 ? "🥈 " : i === 2 ? "🥉 " : `${i + 1}. `;
-              html += `${medal}<strong>${r.name.padEnd(15)}</strong> → ${r.commands} cmds | ${r.time}s<br>`;
-          });
-          list.innerHTML = html;
-      })
-      .catch(err => {
-          console.error("Ranking load error:", err);
-          list.innerHTML = "Error loading rankings. Check internet and try again!";
+
+          html += `<tr class="${rowClass}">
+                        <td>${medal}</td>
+                        <td><strong>${r.name}${myName && r.name === myName ? ' (You)' : ''}</strong></td>
+                        <td>${r.commands}</td>
+                        <td>${r.time}s</td>
+                    </tr>`;
+        } else if (!yourRank && myName && r.name === myName) {
+          yourRank = rank;
+          yourData = r;
+        }
       });
+
+      html += '</tbody></table>';
+      list.innerHTML = html;
+
+      // Row animation
+      list.querySelectorAll('.ranking-row').forEach((row, i) => {
+        setTimeout(() => {
+          row.style.opacity = '1';
+          row.style.transform = 'translateY(0)';
+        }, i * 100);
+      });
+
+      // RANK BOX
+      if (yourRank) {
+        const box = document.createElement('div');
+        box.id = 'your-rank-box';
+        box.innerHTML = `
+                    <div style="margin:20px auto; padding:18px; background:#001a0d; border:3px solid #00ff88; border-radius:16px; text-align:center; max-width:340px; color:white; font-family:sans-serif;">
+                        <div style="font-size:2.8em; font-weight:bold; color:#00ff88;">
+                            ${yourRank <= 3 ? ['1st', '2nd', '3rd'][yourRank - 1] : '#' + yourRank}
+                        </div>
+                        <div style="font-size:1.4em; margin:8px 0;"><strong>You: ${yourData.name}</strong></div>
+                        <div style="color:#ccc;">${yourData.commands} commands • ${yourData.time}s</div>
+                    </div>
+                `;
+        list.parentNode.insertBefore(box, list);
+      }
+    })
+    .catch(err => {
+      console.error("Leaderboard error:", err);
+      list.innerHTML = '<p class="error-text">Error loading rankings!</p>';
+    });
 }
 
+function updateGlobalRankDisplay(rank) {
+  document.querySelectorAll('#player-rank, [data-rank], .player-rank').forEach(el => {
+    if (!rank) {
+      el.textContent = '-';
+    } else if (rank <= 3) {
+      el.textContent = ['1st place', '2nd place', '3rd place'][rank - 1];
+    } else {
+      el.textContent = '#' + rank;
+    }
+  });
+}
 window.addEventListener('load', () => {
   startPhase(1);
 });

@@ -511,47 +511,250 @@ button[onclick="resetGame()"]:hover,
     cursor: not-allowed;
 }
 
+/* ─────── UPGRADED LEADERBOARD  ─────── */
+
+.modal-content {
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+    background: #0d1117;
+    padding: 28px;
+    border-radius: 18px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+    max-width: 680px;
+    width: 92%;
+    position: relative;
+    color: #e6edf3;
+    border: 1px solid #30363d;
+}
+
+.close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 32px;
+    cursor: pointer;
+    color: #8b949e;
+    transition: color 0.2s, transform 0.3s;
+}
+
+.close:hover {
+    color: #f85149;
+    transform: rotate(90deg) scale(1.1);
+}
+
+.modal h2 {
+    text-align: center;
+    margin: 0 0 24px;
+    font-size: 28px;
+    background: linear-gradient(90deg, #00ff88, #00cc6a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+
+.phase-select {
+    display: block;
+    margin: 0 auto 24px;
+    padding: 14px 18px;
+    font-size: 17px;
+    border-radius: 12px;
+    border: 2px solid #30363d;
+    background: #161b22;
+    color: #e6edf3;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.phase-select:focus,
+.phase-select:hover {
+    border-color: #00ff88;
+    box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.2);
+    outline: none;
+}
+
+
+.green-btn {
+    padding: 15px 36px;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #00ff88, #00cc66);
+    color: #000;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+}
+
+.green-btn:hover {
+    background: linear-gradient(135deg, #00cc66, #00ff88);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 255, 136, 0.4);
+}
+
+.green-btn:active {
+    transform: translateY(0);
+}
+
+
+.ranking-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 17px;
+    background: transparent;
+}
+
+.ranking-table thead tr {
+    background: linear-gradient(90deg, #1f6feb, #388bfd);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.ranking-table th {
+    padding: 16px 18px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+.ranking-table th:nth-child(3),
+.ranking-table th:nth-child(4),
+.ranking-table td:nth-child(3),
+.ranking-table td:nth-child(4) {
+    text-align: right;
+}
+
+.ranking-table td {
+    padding: 16px 18px;
+    background: #161b22;
+    color: #e6edf3;
+    border: 1px solid #30363d;
+}
+
+.even-row {
+    background: #1a1f29 !important;
+}
+
+.odd-row {
+    background: #161b22 !important;
+}
+
+.ranking-row {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.ranking-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 255, 136, 0.25);
+    border: 1px solid #00ff88 !important;
+}
+
+
+.ranking-table td:first-child {
+    font-weight: 900;
+    width: 70px;
+    position: relative;
+}
+
+
+.ranking-row:nth-child(1) td:first-child {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+    font-size: 1.4em;
+}
+
+
+.ranking-row:nth-child(2) td:first-child {
+    color: #c0c0c0;
+    text-shadow: 0 0 10px rgba(192, 192, 192, 0.6);
+    font-size: 1.35em;
+}
+
+
+.ranking-row:nth-child(3) td:first-child {
+    color: #cd7f32;
+    text-shadow: 0 0 10px rgba(205, 127, 50, 0.6);
+    font-size: 1.3em;
+}
+
+
+.ranking-row:nth-child(n+4) td:first-child {
+    color: #00ff88;
+    font-weight: 700;
+}
+
+
+#your-rank-box {
+    animation: pulseGlow 2s infinite alternate;
+}
+
+@keyframes pulseGlow {
+    from {
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+    }
+
+    to {
+        box-shadow: 0 0 35px rgba(0, 255, 136, 0.7);
+    }
+}
+
+
+.loading-text {
+    color: #58a6ff;
+    font-weight: bold;
+}
+
+.no-records-text {
+    color: #8b949e;
+    font-size: 17px;
+}
+
+.error-text {
+    color: #f85149;
+    font-weight: bold;
+}
+
 @media (max-width: 768px) {
-    
-    /* Ensure the grid's immediate container is wide enough */
+
+
     .grid-outer {
-        /* This padding adds the desired 12px safe space */
         padding: 0 12px;
-        /* CRITICAL: Must allow horizontal scrolling on the outer container */
-        overflow-x: auto; 
+        overflow-x: auto;
         overflow-y: hidden;
-        /* The rest of the styles below ensure the grid is fixed size */
         width: 100vw;
         box-sizing: border-box;
         margin-bottom: 10px;
     }
 
-    /* Inner Container */
+   
     .grid-inner {
-        /* CRITICAL: Forces the container to be the fixed size */
+       
         width: 404px !important;
-        margin: 0 auto; 
+        margin: 0 auto;
         padding: 0;
-        /* If 100vw is < 404px, the margin: auto will center the 404px block
-           and the overflow-x: auto on .grid-outer will provide the scrollbar. */
+       
     }
 
     #game-container {
-        /* CRITICAL: Keep fixed size */
         width: 404px !important;
         height: 404px !important;
         flex-shrink: 0;
     }
-    
+
     #grid {
-        /* CRITICAL: Keep fixed size and fixed children sizes */
         width: 404px;
         height: 404px;
         grid-template: repeat(6, 64px) / repeat(6, 64px);
-        /* ... (rest of the grid styles) ... */
     }
-    
-    /* Ensure all inner elements revert to fixed pixel sizes */
+
     #cube,
     .point {
         width: 56px;
