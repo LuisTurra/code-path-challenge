@@ -9,12 +9,10 @@
 html,
 body {
     height: 100dvh;
-    overflow-x: auto;
+    overflow-x: hidden;
     font-family: 'Montserrat', sans-serif;
     background: #1a1a1a;
     color: #fff;
-    padding: 0;
-    margin: 0;
 }
 
 #top-controls {
@@ -73,6 +71,82 @@ body {
     margin-bottom: 20px;
 }
 
+/* ──── Core Modal Setup (Tutorial, Phase Selection) ──── */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    /* Darker backdrop */
+    /* FIX: Centering the modal */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Base Modal Content (Ensure the tutorial box has a defined look) */
+.modal-content {
+    background: #161b22;
+    /* Dark background */
+    color: #e6edf3;
+    padding: 40px 30px;
+    /* Increased padding */
+    border-radius: 18px;
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    border: 2px solid #30363d;
+    position: relative;
+    /* Needed for the absolute close button */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Close button positioning within the content box */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 32px;
+    cursor: pointer;
+    color: #8b949e;
+    transition: color 0.2s, transform 0.3s;
+}
+
+.close:hover {
+    color: #f85149;
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* ──────────────────────────────────────────────────────── */
+
+/* ──── Button Styles ──── */
+.green-btn {
+    padding: 15px 36px;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #00ff88, #00cc66);
+    color: #000;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+}
+
+.green-btn:hover {
+    background: linear-gradient(135deg, #00cc66, #00ff88);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 255, 136, 0.4);
+}
+
+.green-btn:active {
+    transform: translateY(0);
+}
+
 .big-button {
     background: linear-gradient(45deg, #00cc00, #00ff00);
     color: #000;
@@ -89,6 +163,32 @@ body {
     transform: translateY(-4px);
 }
 
+#start-btn,
+button[onclick="resetGame()"],
+#next-btn {
+    background: linear-gradient(45deg, #00cc00, #00ff00);
+    color: #000;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 0 6px 15px rgba(0, 204, 0, .5);
+    transition: all .3s;
+}
+
+#start-btn:hover,
+button[onclick="resetGame()"]:hover,
+#next-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 204, 0, .7);
+}
+
+/* ──────────────────────────────────────────────────────── */
+
+
+/* ──── Game Layout ──── */
 #phase-nav {
     display: flex;
     justify-content: center;
@@ -129,7 +229,6 @@ body {
     max-width: 90vw;
     flex-wrap: wrap;
     justify-content: center;
-
 }
 
 #game-container {
@@ -255,30 +354,6 @@ body {
     flex-wrap: wrap;
 }
 
-#start-btn,
-button[onclick="resetGame()"],
-.green-btn,
-#next-btn {
-    background: linear-gradient(45deg, #00cc00, #00ff00);
-    color: #000;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 16px;
-    box-shadow: 0 6px 15px rgba(0, 204, 0, .5);
-    transition: all .3s;
-}
-
-#start-btn:hover,
-button[onclick="resetGame()"]:hover,
-.green-btn:hover,
-#next-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0, 204, 0, .7);
-}
-
 .menu-buttons-stack {
     display: flex;
     flex-direction: column;
@@ -307,14 +382,7 @@ button[onclick="resetGame()"]:hover,
     box-shadow: 0 12px 30px rgba(0, 204, 0, 0.7);
 }
 
-#function-btn {
-    background: linear-gradient(45deg, #ff6b00, #ffaa00) !important;
-    color: #000 !important;
-    font-weight: bold;
-    padding: 12px 20px;
-    font-size: 16px;
-}
-
+#function-btn,
 #function2-btn {
     background: linear-gradient(45deg, #ff6b00, #ffaa00) !important;
     color: #000 !important;
@@ -323,26 +391,7 @@ button[onclick="resetGame()"]:hover,
     font-size: 16px;
 }
 
-#function-box {
-    background: #1a1a1a;
-    padding: 12px;
-    border: 2px solid #ff6b00;
-    border-radius: 12px;
-    text-align: center;
-    max-width: 220px;
-}
-
-#function-commands {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 6px;
-    min-height: 30px;
-    padding: 6px;
-    background: #111;
-    border-radius: 8px;
-}
-
+#function-box,
 #function2-box {
     background: #1a1a1a;
     padding: 12px;
@@ -352,6 +401,7 @@ button[onclick="resetGame()"]:hover,
     max-width: 220px;
 }
 
+#function-commands,
 #function2-commands {
     display: flex;
     justify-content: center;
@@ -399,57 +449,169 @@ button[onclick="resetGame()"]:hover,
     background: #ff6b00 !important;
 }
 
-.modal,
+/* ──────────────────────────────────────────────────────── */
+
+
+/* ──── Result Modal (Final, Cleaned Version) ──── */
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+
+    80% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 #result-modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100dvh;
-    background: rgba(0, 0, 0, .9);
+    background: rgba(0, 0, 0, 0.94);
     display: none;
     align-items: center;
     justify-content: center;
+    z-index: 3000;
     padding: 20px;
-    z-index: 2000;
+    box-sizing: border-box;
+    backdrop-filter: blur(10px);
 }
 
-.modal-content,
-#result-modal {
-    background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
-    padding: 30px;
-    border-radius: 20px;
-    max-width: 90vw;
-    max-height: 80dvh;
-    overflow-y: auto;
-    border: 3px solid #003087;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .9);
+#result-modal .result-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#result-modal .result-content {
+    pointer-events: all;
+    background: linear-gradient(135deg, #16213e, #0f1a2e);
+    color: white;
+    padding: 40px 30px;
+    border-radius: 28px;
+    max-width: 440px;
+    width: 100%;
     text-align: center;
-}
-
-.close,
-.close-modal {
-    color: #aaa;
-    background: none;
-    border: none;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.close:hover,
-.close-modal:hover {
-    color: #fff;
+    border: 4px solid #00ff88;
+    box-shadow:
+        0 0 40px rgba(0, 255, 136, 0.4),
+        0 20px 60px rgba(0, 0, 0, 0.6);
+    animation: popIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    transform: scale(1);
 }
 
 #result-modal h3 {
-    color: #00ff00;
-    font-size: 2em;
-    margin-bottom: 20px;
-    text-shadow: 0 0 20px rgba(0, 255, 0, .5);
+    font-size: 3em;
+    margin: 0 0 16px;
+    color: #00ff88;
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.7);
+    font-weight: 800;
 }
 
+.result-buttons {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    margin-top: 32px;
+    flex-wrap: wrap;
+}
+
+.result-buttons .green-btn {
+    min-width: 170px;
+    padding: 16px 32px;
+    font-size: 1.2em;
+    font-weight: 700;
+    border-radius: 16px;
+}
+
+/* ──────────────────────────────────────────────────────── */
+
+
+/* ──── Name Entry Modal ──── */
+#name-entry-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2500;
+    padding: 20px;
+    box-sizing: border-box;
+    backdrop-filter: blur(12px);
+}
+
+#name-entry-modal .name-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+#name-entry-modal .name-content {
+    background: linear-gradient(135deg, #16213e, #0f1a2e);
+    color: white;
+    padding: 40px 30px;
+    border-radius: 28px;
+    max-width: 460px;
+    width: 100%;
+    text-align: center;
+    border: 4px solid #00ff88;
+    box-shadow:
+        0 0 40px rgba(0, 255, 136, 0.5),
+        0 20px 60px rgba(0, 0, 0, 0.7),
+        inset 0 0 30px rgba(0, 255, 136, 0.1);
+    animation: popIn 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+#name-entry-modal h3 {
+    font-size: 2.8em;
+    margin: 0 0 12px;
+    color: #00ff88;
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.7);
+    font-weight: 800;
+}
+
+#name-entry-modal h3 span {
+    color: #00cc66;
+}
+
+.name-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.name-buttons .green-btn {
+    min-width: 180px;
+    padding: 16px 32px;
+    font-size: 1.15em;
+    font-weight: 700;
+    border-radius: 16px;
+}
+
+/* ──────────────────────────────────────────────────────── */
+
+
+/* ──── Start Screen Components ──── */
 #start-background {
     position: absolute;
     top: 0;
@@ -459,7 +621,6 @@ button[onclick="resetGame()"]:hover,
     background-image: url('images/bg.png');
     background-size: cover;
     opacity: 0.8;
-
     z-index: -1;
 }
 
@@ -485,7 +646,6 @@ button[onclick="resetGame()"]:hover,
 
 .start-phase-btn.unlocked {
     background: #003087;
-
 }
 
 .start-phase-btn img {
@@ -511,37 +671,75 @@ button[onclick="resetGame()"]:hover,
     cursor: not-allowed;
 }
 
-/* ─────── UPGRADED LEADERBOARD  ─────── */
+/* ──────────────────────────────────────────────────────── */
+/* ─────── FINAL RANKING MODALS – PERFECT SCROLL + ALWAYS VISIBLE CLOSE ─────── */
 
-.modal-content {
-    transform: scale(0.95);
-    transition: transform 0.3s ease;
-    background: #0d1117;
-    padding: 28px;
-    border-radius: 18px;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
-    max-width: 680px;
-    width: 92%;
+#ranking-modal,
+#global-rank-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* The actual modal box */
+#ranking-modal .modal-content,
+#global-rank-container .modal-content {
     position: relative;
-    color: #e6edf3;
-    border: 1px solid #30363d;
+    /* background: #001a0d ; */
+    border: 3px solid #00ff88;
+    border-radius: 20px;
+    width: 92%;
+    max-width: 500px;
+    max-height: 90vh;
+    padding: 0;
+    overflow: hidden;
+    /* box-shadow: 0 0 30px rgba(0, 255, 136, 0.6); */
 }
 
-.close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    font-size: 32px;
-    cursor: pointer;
-    color: #8b949e;
-    transition: color 0.2s, transform 0.3s;
+/* This is the REAL scrolling area */
+#ranking-modal .scroll-area,
+#global-rank-container .scroll-area {
+    padding: 55px 25px 25px 25px;
+    overflow-y: auto;
+    max-height: 90vh;
+    box-sizing: border-box;
 }
 
-.close:hover {
-    color: #f85149;
-    transform: rotate(90deg) scale(1.1);
+/* Glowing green scrollbar */
+#ranking-modal .scroll-area::-webkit-scrollbar,
+#global-rank-container .scroll-area::-webkit-scrollbar {
+    width: 14px;
 }
 
+#ranking-modal .scroll-area::-webkit-scrollbar-thumb,
+#global-rank-container .scroll-area::-webkit-scrollbar-thumb {
+    background:  #00ff88;
+    border-radius: 10px;
+    border: 3px solid #001a0d;
+}
+
+/* Close button – always on top */
+#ranking-modal .close,
+#global-rank-container .close {
+    color: #00ff88 ;
+    background: rgba(0, 0, 0, 0.6) !important;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    line-height: 36px !important;
+    text-align: center;
+    font-size: 34px !important;
+    text-shadow: 0 0 15px #00ff88;
+}
+
+
+#ranking-list,
+#global-ranking-list {
+    width: 100%;
+    margin: 0;
+}
+
+/* Modal Headers */
 .modal h2 {
     text-align: center;
     margin: 0 0 24px;
@@ -553,7 +751,6 @@ button[onclick="resetGame()"]:hover,
     font-weight: 800;
     letter-spacing: 1px;
 }
-
 
 .phase-select {
     display: block;
@@ -575,38 +772,21 @@ button[onclick="resetGame()"]:hover,
     outline: none;
 }
 
-
-.green-btn {
-    padding: 15px 36px;
-    font-size: 18px;
-    font-weight: 600;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    background: linear-gradient(135deg, #00ff88, #00cc66);
-    color: #000;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
-}
-
-.green-btn:hover {
-    background: linear-gradient(135deg, #00cc66, #00ff88);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 255, 136, 0.4);
-}
-
-.green-btn:active {
-    transform: translateY(0);
-}
-
-
+/* Table Styling */
 .ranking-table {
     width: 100%;
-    border-collapse: separate;
+    border-collapse: collapse;
     border-spacing: 0 8px;
     font-family: 'Courier New', monospace;
     font-size: 17px;
+    table-layout: fixed;
     background: transparent;
+}
+
+.ranking-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 5;
 }
 
 .ranking-table thead tr {
@@ -617,7 +797,8 @@ button[onclick="resetGame()"]:hover,
 
 .ranking-table th {
     padding: 16px 18px;
-    font-weight: 700;
+    text-align: left;
+    font-weight: 800;
     letter-spacing: 0.8px;
 }
 
@@ -629,41 +810,34 @@ button[onclick="resetGame()"]:hover,
 }
 
 .ranking-table td {
-    padding: 16px 18px;
+    padding: 8px 4px;
     background: #161b22;
     color: #e6edf3;
     border: 1px solid #30363d;
-}
-
-.even-row {
-    background: #1a1f29 !important;
-}
-
-.odd-row {
-    background: #161b22 !important;
+    word-wrap: break-word;
 }
 
 .ranking-row {
-    opacity: 0;
-    transform: translateY(20px);
+    opacity: 1;
     transition: all 0.4s ease;
     border-radius: 10px;
     overflow: hidden;
 }
 
-.ranking-row:hover {
+.ranking-table tbody tr:hover td {
+    background: #1e2a3a;
+    border-color: #00ff88;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 255, 136, 0.25);
-    border: 1px solid #00ff88 !important;
+    transition: all 0.3s;
 }
 
-
+/* Rank Coloring */
 .ranking-table td:first-child {
     font-weight: 900;
     width: 70px;
     position: relative;
 }
-
 
 .ranking-row:nth-child(1) td:first-child {
     color: #ffd700;
@@ -671,13 +845,11 @@ button[onclick="resetGame()"]:hover,
     font-size: 1.4em;
 }
 
-
 .ranking-row:nth-child(2) td:first-child {
     color: #c0c0c0;
     text-shadow: 0 0 10px rgba(192, 192, 192, 0.6);
     font-size: 1.35em;
 }
-
 
 .ranking-row:nth-child(3) td:first-child {
     color: #cd7f32;
@@ -685,12 +857,10 @@ button[onclick="resetGame()"]:hover,
     font-size: 1.3em;
 }
 
-
 .ranking-row:nth-child(n+4) td:first-child {
     color: #00ff88;
     font-weight: 700;
 }
-
 
 #your-rank-box {
     animation: pulseGlow 2s infinite alternate;
@@ -705,7 +875,6 @@ button[onclick="resetGame()"]:hover,
         box-shadow: 0 0 35px rgba(0, 255, 136, 0.7);
     }
 }
-
 
 .loading-text {
     color: #58a6ff;
@@ -722,9 +891,11 @@ button[onclick="resetGame()"]:hover,
     font-weight: bold;
 }
 
+/* ──────────────────────────────────────────────────────── */
+
+
+/* ──── Media Queries ──── */
 @media (max-width: 768px) {
-
-
     .grid-outer {
         padding: 0 12px;
         overflow-x: auto;
@@ -734,13 +905,10 @@ button[onclick="resetGame()"]:hover,
         margin-bottom: 10px;
     }
 
-   
     .grid-inner {
-       
         width: 404px !important;
         margin: 0 auto;
         padding: 0;
-       
     }
 
     #game-container {

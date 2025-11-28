@@ -80,6 +80,6 @@ const phases = [
     hasFunction2: true,
     mainCommandLimit: 3,
     functionCommandLimit: 4,
-    function2CommandLimit: 4
+    function2CommandLimit: 1
   }
 ];

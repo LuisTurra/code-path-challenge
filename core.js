@@ -40,8 +40,14 @@ function startPhase(id) {
   if (id === 1) showBasicTutorial();
   else if (id === 3) showPhase3Tutorial();
 }
-
+function closeRankingModal() {
+  // This is for the *Phase* ranking modal (the one without a phase selector)
+  document.getElementById('ranking-modal').style.display = 'none';
+  // This is to close the one that shows the result modal, too
+  document.getElementById('result-modal').style.display = 'none';
+}
 function initPhase(id) {
+
   const phase = phases.find(p => p.id === id);
   currentPathCoords = phase.coords;
   cubePos = phase.startPos || { x: 0, y: 0 };
@@ -57,21 +63,28 @@ function initPhase(id) {
   const funclimitNum = document.getElementById('func-limit-number');
   const func2limitText = document.getElementById('func2-limit-text');
   const func2limitNum = document.getElementById('func2-limit-number');
-  if (phase.mainCommandLimit && phase.mainCommandLimit < Infinity && phase.functionCommandLimit && phase.functionCommandLimit < Infinity && phase.function2CommandLimit && phase.function2CommandLimit < Infinity) {
+
+  if (phase.mainCommandLimit != null && phase.mainCommandLimit < Infinity) {
     limitNum.textContent = phase.mainCommandLimit;
     limitText.style.display = 'block';
+  } else {
+    limitText.style.display = 'none';
+  }
 
+  if (phase.hasFunction && phase.functionCommandLimit != null && phase.functionCommandLimit < Infinity) {
     funclimitNum.textContent = phase.functionCommandLimit;
     funclimitText.style.display = 'block';
+  } else {
+    funclimitText.style.display = 'none';
+  }
 
+  if (phase.hasFunction2 && phase.function2CommandLimit != null && phase.function2CommandLimit < Infinity) {
     func2limitNum.textContent = phase.function2CommandLimit;
     func2limitText.style.display = 'block';
-  }
-  else {
-    limitText.style.display = 'none';
-    funclimitText.style.display = 'none';
+  } else {
     func2limitText.style.display = 'none';
   }
+
 
   document.getElementById('function-btn').style.display = hasFunc ? 'inline-block' : 'none';
   document.getElementById('function-box').style.display = hasFunc ? 'block' : 'none';
@@ -304,6 +317,7 @@ function startGame() {
 }
 
 function checkWin(p) { if (p.x === endPos.x && p.y === endPos.y) showWin(); else showFail('Did not reach B!'); }
+let currentPhaseData = {}; 
 
 function showWin() {
   isAnimating = false;
@@ -315,24 +329,25 @@ function showWin() {
   totalCommands += numFCalls * functionCommands.length;
   totalCommands += numF2Calls * function2Commands.length;
 
-  const playerName = prompt(
-    `PHASE ${phase} COMPLETED!\n${totalCommands} total commands – ${timeTaken}s\n\nEnter your name for GLOBAL leaderboard:`,
-    "Player"
-  );
+  // Store data temporarily
+  currentPhaseData = { phase, totalCommands, timeTaken };
 
-  if (playerName && playerName.trim()) {
-    const name = playerName.trim().substring(0, 15);
-    localStorage.setItem('playerName', name);
-    db.collection("leaderboard").add({
-      phase: phase,
-      name: name,
-      commands: totalCommands,
-      time: parseFloat(timeTaken),
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    })
-      .then(() => console.log("Global score saved!"))
-      .catch(err => console.error("Save failed:", err));
-  }
+  document.getElementById('name-phase-num').textContent = phase;
+  document.getElementById('name-stats').innerHTML = `
+    Completed with <strong>${totalCommands}</strong> total commands<br>
+    Time: <strong>${timeTaken}s</strong>
+  `;
+  document.getElementById('player-name-input').value = localStorage.getItem('playerName') || '';
+
+  document.getElementById('name-entry-modal').style.display = 'flex';
+
+  const input = document.getElementById('player-name-input');
+  input.focus();
+  input.addEventListener('keyup', function (event) {
+    if (event.key === 'Enter') {
+      submitPlayerName();
+    }
+  });
 
   document.getElementById('result-title').textContent = 'Phase Complete!';
   document.getElementById('result-message').innerHTML = `
@@ -347,6 +362,33 @@ function showWin() {
     document.getElementById(`phase-${next}-btn`)?.classList.remove('locked');
   }
   document.getElementById('result-modal').style.display = 'block';
+}
+
+//  Submit name and save to leaderboard
+function submitPlayerName() {
+  const playerName = document.getElementById('player-name-input').value.trim().substring(0, 15);
+  if (!playerName) {
+    alert('Please enter a name!'); 
+    return;
+  }
+  localStorage.setItem('playerName', playerName);
+
+  const { phase, totalCommands, timeTaken } = currentPhaseData;
+  db.collection("leaderboard").add({
+    phase: phase,
+    name: playerName,
+    commands: totalCommands,
+    time: parseFloat(timeTaken),
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  })
+    .then(() => console.log("Global score saved!"))
+    .catch(err => console.error("Save failed:", err));
+
+  closeNameModal();
+}
+
+function closeNameModal() {
+  document.getElementById('name-entry-modal').style.display = 'none';
 }
 
 function showFail(msg) {
@@ -397,12 +439,12 @@ function showPhase3Tutorial() {
   document.querySelector('#tutorial-modal .modal-content').innerHTML = `
     <span class="close" onclick="closeTutorial()">&times;</span>
     <h3>New: FUNCTION (F)</h3>
-    <p>You now have only <strong>4 main commands</strong>!</p>
+    <p>You now have only <strong>5 main commands</strong>!</p>
     <p>Use the orange <strong>FUNCTION box</strong>:<br>
     • Add moves with the small arrows<br>
     • Press the orange <strong>F</strong> button to use it<br>
     • You can use F multiple times!</p>
-    <p><strong>Solve Phase 3 with ≤4 main commands!</strong></p>
+    <p><strong>Solve Phase 3 with ≤5 main commands!</strong></p>
   `;
   showTutorial();
 }
@@ -426,13 +468,13 @@ function showPhaseSelection() {
     }
     buttons.appendChild(btn);
   });
-  document.getElementById('phase-selection-modal').style.display = 'block';
+  document.getElementById('phase-selection-modal').style.display = 'flex';
 }
 
 function closePhaseSelection() {
   document.getElementById('phase-selection-modal').style.display = 'none';
 }
-// 1. GLOBAL RANKINGS BUTTON — NOW WORKS PERFECTLY
+// GLOBAL RANKINGS 
 function showGlobalRankings() {
   const existing = document.getElementById('global-rank-container');
   if (existing) {
@@ -451,18 +493,20 @@ function showGlobalRankings() {
   modal.id = 'global-rank-container';
   modal.className = 'modal';
   modal.style.cssText = 'display:flex; opacity:0;';
-
   modal.innerHTML = `
-        <div class="modal-content" style="transform:scale(0.95); transition:all 0.3s;">
-            <span class="close" onclick="this.closest('#global-rank-container').remove()">&times;</span>
-            <h2>Global Rankings</h2>
-            <select id="ranking-phase-select" onchange="showRanking(this.value)" class="phase-select" style="margin:15px 0; padding:10px; font-size:1em; width:100%; max-width:300px;">
+  <div class="modal-content">
+    <span class="close" onclick="document.getElementById('global-rank-container').remove()">×</span>
+    <div class="scroll-area">
+      <h2>Global Rankings</h2>
+     <select id="ranking-phase-select" onchange="showRanking(this.value)" class="phase-select" style="margin:15px 0; padding:10px; font-size:1em; width:100%; max-width:300px;">
                 ${phases.map(p => `<option value="${p.id}" ${p.id === 1 ? 'selected' : ''}>Phase ${p.id}${p.name ? ' – ' + p.name : ''}</option>`).join('')}
             </select>
-            <div id="global-ranking-list" class="ranking-list"></div>
-            <button onclick="document.getElementById('global-rank-container').remove()" class="green-btn close-btn" style="margin-top:20px;">Close</button>
-        </div>
-    `;
+      <div id="global-ranking-list" class="ranking-list"></div>
+      <button onclick="document.getElementById('global-rank-container').remove()" class="green-btn close-btn">Close</button>
+    </div>
+  </div>
+`;
+  
 
   document.body.appendChild(modal);
 
@@ -472,12 +516,13 @@ function showGlobalRankings() {
     modal.querySelector('.modal-content').style.transform = 'scale(1)';
   }, 10);
 
-  // Load Phase 1 by default
+
   showRanking(1);
 }
 
 
 function showRanking(phase) {
+  console.trace("showRanking called with phase:", phase);
   const phaseNum = parseInt(phase, 10) || 1;
   const isGlobal = !!document.getElementById('global-ranking-list');
   const listId = isGlobal ? 'global-ranking-list' : 'ranking-list';
@@ -555,7 +600,7 @@ function showRanking(phase) {
         }, i * 100);
       });
 
-      // RANK BOX
+      // RANK 
       if (yourRank) {
         const box = document.createElement('div');
         box.id = 'your-rank-box';
@@ -589,5 +634,17 @@ function updateGlobalRankDisplay(rank) {
   });
 }
 window.addEventListener('load', () => {
-  startPhase(1);
+  document.getElementById('game-screen').classList.remove('active');
+  document.getElementById('start-screen').classList.add('active');
+
+  document.querySelectorAll('.modal, #ranking-modal, #global-rank-container, #phase-selection-modal')
+    .forEach(m => m.style.display = 'none');
+
+  const current = phaseProgress.current || 1;
+  document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.getElementById(`phase-${current}-btn`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // Optional: Auto-open phase selection instead of start screen
+  // showPhaseSelection();
 });

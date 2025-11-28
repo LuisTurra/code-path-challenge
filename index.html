@@ -25,16 +25,20 @@
         </button>
     </div>
 
-    <!-- Tutorial  -->
     <div id="tutorial-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeTutorial()">&times;</span>
-            <h3>How to Play</h3>
-            <p>Click direction buttons to build a command sequence. Cube must stay on <strong>white path</strong> and
-                reach <strong>B (red)</strong>. Hit "Start" to run!<br><br>Forward/back OK, but <strong>no leaving
-                    path</strong>!</p>
-        </div>
-    </div>
+                <div class="modal-content">
+                                    <span class="close" onclick="closeTutorial()">&times;</span>
+                        <h3>How to Play</h3>
+                        <p>Click direction buttons to build a command sequence. Cube must stay on <strong>white
+                    path</strong> and
+                                reach <strong>B (red)</strong>. Hit "Start" to run!<br><br>Forward/back OK, but
+                <strong>no leaving
+                                        path</strong>!
+            </p>
+                                    <button onclick="closeTutorial()" class="green-btn" style="margin-top: 15px;">Got
+                It!</button>
+                    </div>
+            </div>
 
     <!-- Start Screen  -->
     <div id="start-screen" class="screen active">
@@ -58,10 +62,39 @@
             <div id="phase-selection-buttons">
 
             </div>
-            <button onclick="closePhaseSelection()" class="green-btn">Back to Menu</button>
+            <button onclick="showStartScreen()" class="green-btn">Back to Menu</button>
         </div>
     </div>
+    <!-- Entry Name -->
 
+    <div id="name-entry-modal">
+        <div class="name-wrapper">
+            <div class="name-content">
+                <h3>Phase <span id="name-phase-num"></span> Completed!</h3>
+
+                <div id="name-stats" style="margin: 20px 0; font-size: 1.3em; line-height: 1.6;">
+
+                </div>
+
+                <div style="margin: 25px 0;">
+                    <input type="text" id="player-name-input" placeholder="Enter your name" maxlength="15"
+                        autocomplete="off" style="width: 100%; padding: 16px; font-size: 1.2em; 
+                      border: 2px solid #00ff88; border-radius: 12px; 
+                      background: rgba(0,0,0,0.4); color: white; 
+                      text-align: center; outline: none;
+                      box-shadow: 0 0 20px rgba(0,255,136,0.3);">
+                </div>
+
+                <div class="name-buttons">
+                    <button onclick="submitPlayerName()" class="green-btn">Submit to Leaderboard</button>
+                    <button onclick="closeNameModal()" class="green-btn"
+                        style="background: #444; border: 2px solid #666;">
+                        Skip
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Game Screen -->
     <div id="game-screen" class="screen">
         <div id="phase-nav">
@@ -180,17 +213,18 @@
 
 
         <!-- Result -->
-        <div id="result-modal" style="display:none;">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <h3 id="result-title"></h3>
-                <p id="result-message"></p>
-                <div id="result-buttons">
-                    <button onclick="nextPhase()" id="next-btn" class="green-btn">Next Phase →</button>
-                    <button onclick="resetGame(); closeModal();" class="green-btn">Play Again</button>
+        <!-- RESULT MODAL - PHASE COMPLETE -->
+        <div id="result-modal">
+            <div class="result-wrapper">
+                <div class="result-content">
+                    <h3 id="result-title">Phase Complete!</h3>
+                    <div id="result-message" style="font-size:1.3em; margin:20px 0; line-height:1.5;"></div>
 
+                    <div class="result-buttons">
+                        <button id="next-btn" onclick="nextPhase()" class="green-btn">Next Phase</button>
+                        <button onclick="resetGame(); closeModal();" class="green-btn">Play Again</button>
+                    </div>
                 </div>
-
             </div>
         </div>
         <!-- Button Ranking -->
@@ -204,18 +238,18 @@
         </div>
 
         <!-- RANKING MODAL (for single phase) -->
-        <div id="ranking-modal" class="modal">
+        <div id="ranking-modal" class="modal" style="display:none;">
             <div class="modal-content">
-                <span class="close"
-                    onclick="document.getElementById('ranking-modal').style.display='none';">&times;</span>
-                <h2 id="ranking-title">PHASE RANKING</h2>
-                <div id="ranking-list" class="ranking-list"></div>
-                <button onclick="document.getElementById('ranking-modal').style.display='none';"
-                    class="green-btn close-btn">Close</button>
+                <span class="close" onclick="closeRankingModal()">×</span>
+                <div class="scroll-area"> <!-- ← ADD THIS WRAPPER -->
+                    <h2 id="ranking-title" style="text-align:center; margin-top:0;">Phase 1 Ranking</h2>
+                    <div id="ranking-list"></div>
+                </div>
             </div>
         </div>
+
         <!-- Phase Selection -->
-        <div id="phase-selection-modal" class="modal">
+        <!-- <div id="phase-selection-modal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closePhaseSelection()">&times;</span>
                 <h2>Select Phase</h2>
@@ -223,7 +257,7 @@
                 </div>
                 <button onclick="closePhaseSelection()" class="green-btn">Back to Menu</button>
             </div>
-        </div>
+        </div> -->
 
         <!-- Firebase -->
         <script>
