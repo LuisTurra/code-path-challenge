@@ -94,7 +94,7 @@ function initPhase(id) {
   functionCommands = [];
   function2Commands = [];
   updateFunctionDisplay();
-
+  updateRecursiveButtonsVisibility();
   initGame();
 }
 
@@ -211,10 +211,9 @@ function updateCommandDisplay() {
     list.appendChild(icon);
   });
 }
-
 function updateFunctionDisplay() {
+
   const box = document.getElementById('function-commands');
-  const box2 = document.getElementById('function2-commands');
   if (functionCommands.length === 0) {
     box.innerHTML = '<span style="color:#666">[]</span>';
   } else {
@@ -222,10 +221,18 @@ function updateFunctionDisplay() {
     functionCommands.forEach(dir => {
       const icon = document.createElement('span');
       icon.className = 'cmd-icon function-icon';
-      icon.innerHTML = getDirectionIcon(dir);
+      if (dir === 'F2') {
+        icon.innerHTML = '<i class="fas fa-cogs" style="color:#ff6600;"></i><sub>2</sub>';
+        icon.title = 'Call F2';
+      } else {
+        icon.innerHTML = getDirectionIcon(dir);
+      }
       box.appendChild(icon);
     });
   }
+
+  
+  const box2 = document.getElementById('function2-commands');
   if (function2Commands.length === 0) {
     box2.innerHTML = '<span style="color:#666">[]</span>';
   } else {
@@ -233,7 +240,12 @@ function updateFunctionDisplay() {
     function2Commands.forEach(dir => {
       const icon = document.createElement('span');
       icon.className = 'cmd-icon function-icon';
-      icon.innerHTML = getDirectionIcon(dir);
+      if (dir === 'F') {
+        icon.innerHTML = '<i class="fas fa-cogs" style="color:#ffaa00;"></i><sub>1</sub>';
+        icon.title = 'Call F1';
+      } else {
+        icon.innerHTML = getDirectionIcon(dir);
+      }
       box2.appendChild(icon);
     });
   }
@@ -249,93 +261,121 @@ function startGame() {
   isAnimating = true;
   gameStartTime = Date.now();
   document.getElementById('start-btn').textContent = 'Running...';
+
   let pos = { ...cubePos };
-  let step = 0;
+
+  const callStack = [
+    {
+      program: commands.slice(),    
+      index: 0                     
+    }
+  ];
+
   function exec() {
-    if (step >= commands.length) {
+    if (callStack.length === 0) {
       checkWin(pos);
       return;
     }
-    const cmd = commands[step];
+
+    const frame = callStack[callStack.length - 1];
+    if (frame.index >= frame.program.length) {
+      callStack.pop();
+      setTimeout(exec, 400);
+      return;
+    }
+
+    const cmd = frame.program[frame.index];
 
     if (cmd === 'F') {
-      let fi = 0;
-      function runF() {
-        if (fi >= functionCommands.length) {
-          step++;
-          setTimeout(exec, 400);
-          return;
-        }
-        move(functionCommands[fi], () => {
-          fi++;
-          setTimeout(runF, 400);
-        });
-      }
-      runF();
-    } else if (cmd === 'F2') {
-      let f2i = 0;
-      function runF2() {
-        if (f2i >= function2Commands.length) {
-          step++;
-          setTimeout(exec, 400);
-          return;
-        }
-        move(function2Commands[f2i], () => {
-          f2i++;
-          setTimeout(runF2, 400);
-        });
-      }
-      runF2();
-    } else {
-      move(cmd, () => {
-        step++;
+      if (functionCommands.length === 0) {
+        frame.index++;
         setTimeout(exec, 400);
+        return;
+      }
+  
+      callStack.push({
+        program: functionCommands.slice(),
+        index: 0
       });
+      frame.index++; 
+      setTimeout(exec, 400);
+      return;
     }
-  }
-  const currentCellSize = getScaledCellSize();
-  function move(c, cb) {
-    let np = { ...pos };
-    if (c === 'up' && pos.y > 0) np.y--;
-    if (c === 'down' && pos.y < gridSize - 1) np.y++;
-    if (c === 'left' && pos.x > 0) np.x--;
-    if (c === 'right' && pos.x < gridSize - 1) np.x++;
-    const onPath = currentPathCoords.some(p => p.x === np.x && p.y === np.y);
 
+    if (cmd === 'F2') {
+      if (function2Commands.length === 0) {
+        frame.index++;
+        setTimeout(exec, 400);
+        return;
+      }
+      callStack.push({
+        program: function2Commands.slice(),
+        index: 0
+      });
+      frame.index++;
+      setTimeout(exec, 400);
+      return;
+    }
+
+    move(cmd, () => {
+      frame.index++;
+      setTimeout(exec, 400);
+    });
+  }
+
+  const currentCellSize = getScaledCellSize();
+
+  function move(dir, cb) {
+    let np = { ...pos };
+    if (dir === 'up' && pos.y > 0) np.y--;
+    if (dir === 'down' && pos.y < gridSize - 1) np.y++;
+    if (dir === 'left' && pos.x > 0) np.x--;
+    if (dir === 'right' && pos.x < gridSize - 1) np.x++;
+
+    const onPath = currentPathCoords.some(p => p.x === np.x && p.y === np.y);
     if (!onPath) {
-      console.error(`Failed at position: x=${np.x}, y=${np.y}. Not on path!`);
       showFail('Cube left the path!');
       return;
     }
+
     pos = np;
     document.getElementById('cube').style.left = `${pos.x * currentCellSize + 4}px`;
     document.getElementById('cube').style.top = `${pos.y * currentCellSize + 4}px`;
-
     document.querySelector(`.grid-cell[data-x="${pos.x}"][data-y="${pos.y}"]`).classList.add('visited');
+
     cb();
   }
+
   exec();
 }
 
+function updateRecursiveButtonsVisibility() {
+  const show = currentPhase >= 7;
+  document.querySelectorAll('.recursive-call-btn').forEach(btn => {
+    btn.style.display = show ? 'inline-block' : 'none';
+  });
+}
+
 function checkWin(p) { if (p.x === endPos.x && p.y === endPos.y) showWin(); else showFail('Did not reach B!'); }
-let currentPhaseData = {}; 
+let currentPhaseData = {};
 
 function showWin() {
   isAnimating = false;
   const timeTaken = ((Date.now() - gameStartTime) / 1000).toFixed(1);
   const phase = phaseProgress.current;
-  let totalCommands = commands.length;
-  const numFCalls = commands.filter(c => c === "F").length;
-  const numF2Calls = commands.filter(c => c === "F2").length;
-  totalCommands += numFCalls * functionCommands.length;
-  totalCommands += numF2Calls * function2Commands.length;
 
-  // Store data temporarily
+  const mainProgramSize = commands.length;
+  const f1Size = functionCommands.length;
+  const f2Size = function2Commands.length;
+
+
+  const totalCommands = mainProgramSize + f1Size + f2Size;
+
   currentPhaseData = { phase, totalCommands, timeTaken };
 
   document.getElementById('name-phase-num').textContent = phase;
   document.getElementById('name-stats').innerHTML = `
-    Completed with <strong>${totalCommands}</strong> total commands<br>
+    Code size: <strong>${totalCommands}</strong> commands<br>
     Time: <strong>${timeTaken}s</strong>
   `;
   document.getElementById('player-name-input').value = localStorage.getItem('playerName') || '';
@@ -352,7 +392,7 @@ function showWin() {
 
   document.getElementById('result-title').textContent = 'Phase Complete!';
   document.getElementById('result-message').innerHTML = `
-    Completed with <strong>${totalCommands}</strong> total commands<br>
+    Code size: <strong>${totalCommands}</strong> commands<br>
     Time: <strong>${timeTaken}s</strong>
   `;
   document.getElementById('next-btn').style.display = 'inline-block';
@@ -367,11 +407,20 @@ function showWin() {
 
 //  Submit name and save to leaderboard
 function submitPlayerName() {
-  const playerName = document.getElementById('player-name-input').value.trim().substring(0, 15);
-  if (!playerName) {
-    alert('Please enter a name!'); 
+  let playerName = document.getElementById('player-name-input').value.trim();
+  
+  
+  if (containsBadWord(playerName)) {
+    alert("That name contains inappropriate words.");
     return;
   }
+
+  playerName = playerName.substring(0, 15); 
+  if (!playerName) {
+    alert('Please enter a name!');
+    return;
+  }
+
   localStorage.setItem('playerName', playerName);
 
   const { phase, totalCommands, timeTaken } = currentPhaseData;
@@ -382,12 +431,29 @@ function submitPlayerName() {
     time: parseFloat(timeTaken),
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   })
-    .then(() => console.log("Global score saved!"))
+    .then(() => console.log("Score saved!"))
     .catch(err => console.error("Save failed:", err));
 
   closeNameModal();
 }
+function containsBadWord(name) {
+  const lowered = name.toLowerCase();
+  const badWords = [
+    // English
+    'fuck', 'shit', 'cunt', 'nigger', 'nigga', 'fag', 'retard', 'bitch',
+    'pussy', 'dick', 'cock', 'asshole', 'whore', 'slut',
+    // Common variations & spaces/leetspeak
+    'f u c k', 'f*ck', 'fu ck', 'fück', 'phuck', 'fuk',
+    'sh1t', 'sh*t', 's h i t',
+    'nigg', 'n1gger', 'n igger',
+    // Spanish / Portuguese (common in global games)
+    'puta', 'mierda', 'joder', 'polla', 'coño', 'cago', 'caca',
+    'caralho', 'porra', 'cu', 'buceta', 'pau',
+    
+  ];
 
+  return badWords.some(word => lowered.includes(word));
+}
 function closeNameModal() {
   document.getElementById('name-entry-modal').style.display = 'none';
 }
@@ -454,8 +520,9 @@ function showPhase7Tutorial() {
     <span class="close" onclick="closeTutorial()">&times;</span>
     <h3>New: FUNCTION 2 (F2)</h3>
     <p>Now, you have two <strong>FUNCTIONS boxes</strong>:<br>
-    • Add moves with the small arrows<br>
     • Press the orange <strong>F1</strong> or <strong>F2</strong> button to use them<br>
+    • You can call function 2 on function 1 and call function 1 on Function 2, </p>
+    • <strong>BUT BE CAREFUL</strong> you dont want be stuck in infinite loop!</p>
     • Is not mandatory to use it, but will help you!</p>
     <p><strong>Solve Phase 7 !</strong></p>
   `;
@@ -518,7 +585,7 @@ function showGlobalRankings() {
     </div>
   </div>
 `;
-  
+
 
   document.body.appendChild(modal);
 
@@ -659,4 +726,5 @@ window.addEventListener('load', () => {
 
   // Optional: Auto-open phase selection instead of start screen
   // showPhaseSelection();
+  updateRecursiveButtonsVisibility();
 });
