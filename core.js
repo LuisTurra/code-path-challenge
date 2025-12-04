@@ -39,6 +39,7 @@ function startPhase(id) {
 
   if (id === 1) showBasicTutorial();
   else if (id === 3) showPhase3Tutorial();
+  else if (id === 7) showPhase7Tutorial();
 }
 function closeRankingModal() {
   // This is for the *Phase* ranking modal (the one without a phase selector)
@@ -448,7 +449,18 @@ function showPhase3Tutorial() {
   `;
   showTutorial();
 }
-
+function showPhase7Tutorial() {
+  document.querySelector('#tutorial-modal .modal-content').innerHTML = `
+    <span class="close" onclick="closeTutorial()">&times;</span>
+    <h3>New: FUNCTION 2 (F2)</h3>
+    <p>Now, you have two <strong>FUNCTIONS boxes</strong>:<br>
+    • Add moves with the small arrows<br>
+    • Press the orange <strong>F1</strong> or <strong>F2</strong> button to use them<br>
+    • Is not mandatory to use it, but will help you!</p>
+    <p><strong>Solve Phase 7 !</strong></p>
+  `;
+  showTutorial();
+}
 // Phase Selection
 function showPhaseSelection() {
   const buttons = document.getElementById('phase-selection-buttons');
