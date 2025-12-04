@@ -269,20 +269,20 @@
 
         <!-- Firebase -->
         <script type="module">
-            // Tenta carregar o config local (só existe na sua máquina)
+            
             try {
                 const { firebaseConfig } = await import('./firebase-config.js');
                 window.firebaseConfig = firebaseConfig;
             } catch (e) {
-                // Se não achar o arquivo local (ex: alguém abriu no GitHub Pages), carrega do Firebase Hosting
+                
                 window.firebaseConfig = {
                     apiKey: "chave-falsa-so-pra-nao-dar-erro",
-                    // ... o resto pode ficar vazio ou falso
+                   
                 };
             }
         </script>
         <script type="module">
-            // Agora usa o config que foi carregado no window
+            
             firebase.initializeApp(window.firebaseConfig);
             const db = firebase.firestore();
         </script>
