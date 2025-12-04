@@ -268,17 +268,22 @@
         </div> -->
 
         <!-- Firebase -->
-        <script>
-            const firebaseConfig = {
-                apiKey: "AIzaSyAmUw8vy-bIe4zw70o-vLbWGdti9FKVsYE",
-                authDomain: "code-path-challenge.firebaseapp.com",
-                projectId: "code-path-challenge",
-                storageBucket: "code-path-challenge.firebasestorage.app",
-                messagingSenderId: "6171949956",
-                appId: "1:6171949956:web:7512a3952c928ee8d37bd1",
-                measurementId: "G-ZQTQTSMFJL"
-            };
-            firebase.initializeApp(firebaseConfig);
+        <script type="module">
+            // Tenta carregar o config local (só existe na sua máquina)
+            try {
+                const { firebaseConfig } = await import('./firebase-config.js');
+                window.firebaseConfig = firebaseConfig;
+            } catch (e) {
+                // Se não achar o arquivo local (ex: alguém abriu no GitHub Pages), carrega do Firebase Hosting
+                window.firebaseConfig = {
+                    apiKey: "chave-falsa-so-pra-nao-dar-erro",
+                    // ... o resto pode ficar vazio ou falso
+                };
+            }
+        </script>
+        <script type="module">
+            // Agora usa o config que foi carregado no window
+            firebase.initializeApp(window.firebaseConfig);
             const db = firebase.firestore();
         </script>
         <script src="core.js"></script>
