@@ -268,23 +268,41 @@
         </div> -->
 
         <!-- Firebase -->
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+        
         <script type="module">
-            
-            try {
-                const { firebaseConfig } = await import('./firebase-config.js');
-                window.firebaseConfig = firebaseConfig;
-            } catch (e) {
-                
-                window.firebaseConfig = {
-                    apiKey: "chave-falsa-so-pra-nao-dar-erro",
-                   
-                };
+            let firebaseConfig = {
+                apiKey: "fake-key-so-erro-nao-quebra",
+                authDomain: "code-path-challenge.firebaseapp.com",
+                projectId: "code-path-challenge",
+                storageBucket: "code-path-challenge.firebasestorage.app",
+                messagingSenderId: "6171949956",
+                appId: "1:6171949956:web:111111111111111111111111",
+                measurementId: "G-XXXXXXXXXX"
+            };
+
+            if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+                try {
+                    const local = await import("./firebase-config.js");
+                    firebaseConfig = local.firebaseConfig;
+                    console.log("Config local carregado com sucesso!");
+                } catch (e) {
+                    console.warn("firebase-config.js não encontrado – normal se estiver hospedado");
+                }
             }
-        </script>
-        <script type="module">
-            
-            firebase.initializeApp(window.firebaseConfig);
+
+            firebase.initializeApp(firebaseConfig);
+
             const db = firebase.firestore();
+            const storage = firebase.storage();
+
+            window.db = db;
+            window.storage = storage;
+
+            console.log("Firebase inicializado com sucesso!");
         </script>
         <script src="core.js"></script>
         <script src="phases.js"></script>
