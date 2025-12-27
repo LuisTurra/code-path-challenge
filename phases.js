@@ -81,5 +81,19 @@ const phases = [
     mainCommandLimit: 5,
     functionCommandLimit: 4,
     function2CommandLimit: 3
+  },
+  {
+    id: 8,
+    startPos: { x: 0, y: 5 },
+    endPos: { x: 4, y: 2 },
+    coords: [
+      { x: 0, y: 5 }, { x: 0, y: 4 }, { x: 0, y: 3 }, { x: 1, y: 3 }, { x:2, y: 3 }, 
+      { x: 2, y: 2 }, { x: 2, y: 1 }, { x: 3, y: 1 }, { x: 4, y: 1 }, { x: 4, y: 2 }],
+      
+    hasFunction: true,
+    hasFunction2: true,
+    mainCommandLimit: 5,
+    functionCommandLimit: 3,
+    function2CommandLimit: 3
   }
 ];
