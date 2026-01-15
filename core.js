@@ -1,18 +1,180 @@
 const gridSize = 6;
-// const cellSize = 64;
-// let cubePos = { x: 0, y: 0 };
-// let endPos = { x: 5, y: 5 };
 let commands = [];
 let functionCommands = [];
 let function2Commands = [];
 let currentPathCoords = [];
-let phaseProgress = { current: 1, unlocked: [1, 2, 3, 4, 5, 6, 7,8] };
+let phaseProgress = { current: 1, unlocked: [1, 2, 3, 4, 5, 6, 7, 8] };
 let isAnimating = false;
 let mainCommandLimit = Infinity;
 let currentFunctionLimit = Infinity;
 let currentPhase = 1;
 let gameStartTime = 0;
 
+// ==== SISTEMA DE TRADUÇÃO ====
+let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('pt') ? 'pt' : 'en');
+
+const translations = {
+  en: {
+    title: "Code Path Challenge",
+    subtitle: "Guide the cube from A to B using direction commands!",
+    how_to_play_title: "How to Play",
+    got_it: "Got It!",
+    phase: "Phase",
+    phases: "Phases",
+    locked: "LOCKED",
+    start_game: "Start",
+    reset: "Reset",
+    running: "Running...",
+    failed: "Failed",
+    cube_left_path: "Cube left the path!",
+    not_reach_b: "Did not reach B!",
+    only_main_commands_alert: "Only {0} main commands allowed! Use FUNCTION (F)",
+    main_limit_reached: "Main command limit reached!",
+    only_func_commands_alert: "Only {0} commands allowed in the FUNCTION for Phase {1}!",
+    function_f1: "FUNCTION (F1):",
+    function_f2: "FUNCTION 2 (F2):",
+    clear: "Clear",
+    you_have_only: "You have only",
+    function_commands: "function commands",
+    main_commands: "main commands – use FUNCTION (F) wisely!",
+    phase_complete: "Phase Complete!",
+    next_phase: "Next Phase",
+    play_again: "Play Again",
+    commands_label: "Commands:",
+    code_size: "Code size",
+    commands_unit: "commands",
+    time_label: "Time",
+    completed: "Completed!",
+    enter_name_placeholder: "Enter your name",
+    submit_leaderboard: "Submit to Leaderboard",
+    skip: "Skip",
+    home_title: "Home",
+    tutorial_title: "How to Play",
+    global_rankings: "Global Rankings",
+    rankings: "Rankings",
+    close: "Close",
+    loading_rankings: "Loading rankings...",
+    no_records: "No records yet!<br>Be the first in the world!",
+    error_loading: "Error loading rankings!",
+    your_rank_you: "You",
+    inappropriate_name: "That name contains inappropriate words.",
+    enter_name_alert: "Please enter a name!",
+    kofi_button: "Support on Ko-fi ☕",
+    kofi_message: "If you enjoyed the game and can support the development, consider buying a virtual coffee! (Totally optional ❤️)",
+    tutorial_basic_title: "How to Play",
+    tutorial_basic_text: 'Click direction buttons to build a command sequence. Cube must stay on <strong>white path</strong> and reach <strong>B (red)</strong>. Hit "Start" to run!<br><br>Forward/back OK, but <strong>no leaving path</strong>!',
+    tutorial_phase3_title: "New: FUNCTION (F)",
+    tutorial_phase3_text: `<p>You now have only <strong>5 main commands</strong>!</p>
+<p>Use the orange <strong>FUNCTION box</strong>:<br>
+• Add moves with the small arrows<br>
+• Press the orange <strong>F</strong> button to use it<br>
+• You can use F multiple times!</p>
+<p><strong>Solve Phase 3 with ≤5 main commands!</strong></p>`,
+    tutorial_phase7_title: "New: FUNCTION 2 (F2)",
+    tutorial_phase7_text: `<p>Now, you have two <strong>FUNCTIONS boxes</strong>:<br>
+• Press the orange <strong>F1</strong> or <strong>F2</strong> button to use them<br>
+• You can call function 2 on function 1 and call function 1 on Function 2,</p>
+<p><strong>BUT BE CAREFUL</strong> you dont want be stuck in infinite loop!</p>
+<p>• Is not mandatory to use it, but will help you!</p>
+<p><strong>Solve Phase 7!</strong></p>`
+  },
+  pt: {
+    title: "Desafio Caminho do Código",
+    subtitle: "Guie o cubo do ponto A até o ponto B usando os commandos direcionais!",
+    how_to_play_title: "Como Jogar",
+    got_it: "Entendi!",
+    phase: "Fase",
+    phases: "Fases",
+    locked: "BLOQUEADO",
+    start_game: "Iniciar",
+    reset: "Reiniciar",
+    running: "Executando...",
+    failed: "Falhou",
+    cube_left_path: "O cubo saiu do caminho!",
+    not_reach_b: "Não alcançou B!",
+    only_main_commands_alert: "Apenas {0} comandos principais permitidos! Use a FUNÇÃO (F)",
+    main_limit_reached: "Limite de comandos principais atingido!",
+    only_func_commands_alert: "Apenas {0} comandos permitidos na FUNÇÃO para a Fase {1}!",
+    function_f1: "FUNÇÃO (F1):",
+    function_f2: "FUNÇÃO 2 (F2):",
+    clear: "Limpar",
+    you_have_only: "Você tem apenas",
+    function_commands: "comandos de função",
+    main_commands: "comandos principais – use a FUNÇÃO (F) com sabedoria!",
+    phase_complete: "Fase Concluída!",
+    next_phase: "Próxima Fase",
+    play_again: "Jogar Novamente",
+    commands_label: "Comandos:",
+    code_size: "Tamanho do código",
+    commands_unit: "comandos",
+    time_label: "Tempo",
+    completed: "Concluída!",
+    enter_name_placeholder: "Digite seu nome",
+    submit_leaderboard: "Enviar para Classificação",
+    skip: "Pular",
+    home_title: "Início",
+    tutorial_title: "Como Jogar",
+    global_rankings: "Classificações Globais",
+    rankings: "Classificação",
+    close: "Fechar",
+    loading_rankings: "Carregando classificações...",
+    no_records: "Nenhum registro ainda!<br>Seja o primeiro no mundo!",
+    error_loading: "Erro ao carregar classificações!",
+    your_rank_you: "Você",
+    inappropriate_name: "Esse nome contém palavras inadequadas.",
+    enter_name_alert: "Por favor, digite um nome!",
+    kofi_button: "Apoie no Ko-fi ☕",
+    kofi_message: "Se você gostou do jogo e puder apoiar o desenvolvimento, considere comprar um café virtual! (Totalmente opcional ❤️)",
+    tutorial_basic_title: "Como Jogar",
+    tutorial_basic_text: 'Clique nos botões de direção para construir uma sequência de comandos. O cubo deve permanecer no <strong>caminho branco</strong> e alcançar <strong>B (vermelho)</strong>. Pressione "Iniciar" para executar!<br><br>Avançar/recuar OK, mas <strong>sem sair do caminho</strong>!',
+    tutorial_phase3_title: "Novo: FUNÇÃO (F)",
+    tutorial_phase3_text: `<p>Você agora tem apenas <strong>5 comandos principais</strong>!</p>
+<p>Use a caixa laranja <strong>FUNÇÃO</strong>:<br>
+• Adicione movimentos com as setas pequenas<br>
+• Pressione o botão laranja <strong>F</strong> para usá-la<br>
+• Você pode usar F várias vezes!</p>
+<p><strong>Resolva a Fase 3 com ≤5 comandos principais!</strong></p>`,
+    tutorial_phase7_title: "Novo: FUNÇÃO 2 (F2)",
+    tutorial_phase7_text: `<p>Agora você tem duas <strong>caixas de FUNÇÕES</strong>:<br>
+• Pressione o botão laranja <strong>F1</strong> ou <strong>F2</strong> para usá-las<br>
+• Você pode chamar a função 2 na função 1 e chamar a função 1 na Função 2,</p>
+<p><strong>MAS CUIDADO</strong> você não quer ficar preso em loop infinito!</p>
+<p>• Não é obrigatório usar, mas vai ajudar!</p>
+<p><strong>Resolva a Fase 7!</strong></p>`
+  }
+};
+
+function t(key) {
+  return translations[currentLang][key] || translations.en[key] || key;
+}
+
+function format(str, ...args) {
+  return str.replace(/\{(\d+)\}/g, (_, i) => args[i] || '');
+}
+
+function updateTexts() {
+  document.title = t('title');
+  document.documentElement.lang = currentLang === 'pt' ? 'pt-BR' : 'en';
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    el.innerHTML = t(key);
+  });
+
+  const input = document.getElementById('player-name-input');
+  if (input) input.placeholder = t('enter_name_placeholder');
+
+  const homeBtn = document.getElementById('home-btn');
+  if (homeBtn) homeBtn.title = t('home_title');
+  const tutorialBtn = document.getElementById('tutorial-btn');
+  if (tutorialBtn) tutorialBtn.title = t('tutorial_title');
+
+  // Atualiza botão Start se estiver visível
+  const startBtn = document.getElementById('start-btn');
+  if (startBtn && !isAnimating) startBtn.textContent = t('start_game');
+}
+
+// ===================================
 
 function getScaledCellSize() {
   const cellElement = document.querySelector('.grid-cell');
@@ -24,6 +186,7 @@ function showStartScreen() {
   document.getElementById('game-screen').classList.remove('active');
   closeTutorial();
   closePhaseSelection();
+  updateTexts();
 }
 
 function startPhase(id) {
@@ -36,19 +199,19 @@ function startPhase(id) {
   document.getElementById(`phase-${id}-btn`).classList.add('active');
   document.getElementById('ranking-phase-num').textContent = id;
   initPhase(id);
+  updateTexts();
 
   if (id === 1) showBasicTutorial();
   else if (id === 3) showPhase3Tutorial();
   else if (id === 7) showPhase7Tutorial();
 }
+
 function closeRankingModal() {
-  // This is for the *Phase* ranking modal (the one without a phase selector)
   document.getElementById('ranking-modal').style.display = 'none';
-  // This is to close the one that shows the result modal, too
   document.getElementById('result-modal').style.display = 'none';
 }
-function initPhase(id) {
 
+function initPhase(id) {
   const phase = phases.find(p => p.id === id);
   currentPathCoords = phase.coords;
   cubePos = phase.startPos || { x: 0, y: 0 };
@@ -58,6 +221,7 @@ function initPhase(id) {
   function2CommandLimit = phase.function2CommandLimit || Infinity;
   const hasFunc = !!phase.hasFunction;
   const hasFunc2 = !!phase.hasFunction2;
+
   const limitText = document.getElementById('command-limit-text');
   const limitNum = document.getElementById('limit-number');
   const funclimitText = document.getElementById('func-limit-text');
@@ -68,6 +232,7 @@ function initPhase(id) {
   if (phase.mainCommandLimit != null && phase.mainCommandLimit < Infinity) {
     limitNum.textContent = phase.mainCommandLimit;
     limitText.style.display = 'block';
+    limitText.querySelector('strong') ? null : limitText.innerHTML = `${t('you_have_only')} <span id="limit-number">${phase.mainCommandLimit}</span> ${t('main_commands')}`;
   } else {
     limitText.style.display = 'none';
   }
@@ -86,11 +251,11 @@ function initPhase(id) {
     func2limitText.style.display = 'none';
   }
 
-
   document.getElementById('function-btn').style.display = hasFunc ? 'inline-block' : 'none';
   document.getElementById('function-box').style.display = hasFunc ? 'block' : 'none';
   document.getElementById('function2-btn').style.display = hasFunc2 ? 'inline-block' : 'none';
   document.getElementById('function2-box').style.display = hasFunc2 ? 'block' : 'none';
+
   functionCommands = [];
   function2Commands = [];
   updateFunctionDisplay();
@@ -129,66 +294,80 @@ function resetCommands() {
   commands = [];
   functionCommands = [];
   function2Commands = [];
-  // cubePos = { x: 0, y: 0 };
-  document.getElementById('command-list').innerHTML = 'Commands: <span style="color:#666">[]</span>';
+  document.getElementById('command-list').innerHTML = `${t('commands_label')} <span style="color:#666">[]</span>`;
   document.getElementById('function-commands').innerHTML = '<span style="color:#666">[]</span>';
   document.getElementById('function2-commands').innerHTML = '<span style="color:#666">[]</span>';
-  document.getElementById('start-btn').textContent = 'Start';
+  const startBtn = document.getElementById('start-btn');
+  if (startBtn) startBtn.textContent = t('start_game');
   isAnimating = false;
   document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('visited'));
   updateFunctionDisplay();
-
 }
 
 function addCommand(dir) {
   if (isAnimating) return;
-  if (commands.length >= mainCommandLimit) { alert(`Only ${mainCommandLimit} main commands allowed! Use FUNCTION (F)`); return; }
+  if (commands.length >= mainCommandLimit) {
+    alert(format(t('only_main_commands_alert'), mainCommandLimit));
+    return;
+  }
   commands.push(dir);
   updateCommandDisplay();
 }
 
 function addFunctionCommand() {
   if (isAnimating) return;
-  if (commands.length >= mainCommandLimit) { alert('Main command limit reached!'); return; }
+  if (commands.length >= mainCommandLimit) {
+    alert(t('main_limit_reached'));
+    return;
+  }
   commands.push("F");
   updateCommandDisplay();
 }
+
 function addFunction2Command() {
   if (isAnimating) return;
-  if (commands.length >= mainCommandLimit) { alert('Main command limit reached!'); return; }
+  if (commands.length >= mainCommandLimit) {
+    alert(t('main_limit_reached'));
+    return;
+  }
   commands.push("F2");
   updateCommandDisplay();
 }
+
 function addToFunction(dir) {
   if (isAnimating) return;
   if (functionCommands.length >= functionCommandLimit) {
-    alert(`Only ${functionCommandLimit} commands allowed in the FUNCTION for Phase ${currentPhase}!`);
+    alert(format(t('only_func_commands_alert'), functionCommandLimit, currentPhase));
     return;
   }
   functionCommands.push(dir);
   updateFunctionDisplay();
 }
+
 function addToFunction2(dir) {
   if (isAnimating) return;
   if (function2Commands.length >= function2CommandLimit) {
-    alert(`Only ${function2CommandLimit} commands allowed in the FUNCTION for Phase ${currentPhase}!`);
+    alert(format(t('only_func_commands_alert'), function2CommandLimit, currentPhase));
     return;
   }
   function2Commands.push(dir);
   updateFunctionDisplay();
 }
+
 function clearFunction() {
   functionCommands = [];
   updateFunctionDisplay();
 }
+
 function clearFunction2() {
   function2Commands = [];
   updateFunctionDisplay();
 }
+
 function updateCommandDisplay() {
   const list = document.getElementById('command-list');
   list.innerHTML = '';
-  list.textContent = 'Commands: ';
+  list.textContent = t('commands_label') + ' ';
   if (commands.length === 0) {
     const emptySpan = document.createElement('span');
     emptySpan.style.color = '#666';
@@ -211,8 +390,8 @@ function updateCommandDisplay() {
     list.appendChild(icon);
   });
 }
-function updateFunctionDisplay() {
 
+function updateFunctionDisplay() {
   const box = document.getElementById('function-commands');
   if (functionCommands.length === 0) {
     box.innerHTML = '<span style="color:#666">[]</span>';
@@ -231,7 +410,6 @@ function updateFunctionDisplay() {
     });
   }
 
-  
   const box2 = document.getElementById('function2-commands');
   if (function2Commands.length === 0) {
     box2.innerHTML = '<span style="color:#666">[]</span>';
@@ -260,16 +438,14 @@ function startGame() {
   if (commands.length === 0 || isAnimating) return;
   isAnimating = true;
   gameStartTime = Date.now();
-  document.getElementById('start-btn').textContent = 'Running...';
+  document.getElementById('start-btn').textContent = t('running');
 
   let pos = { ...cubePos };
 
-  const callStack = [
-    {
-      program: commands.slice(),    
-      index: 0                     
-    }
-  ];
+  const callStack = [{
+    program: commands.slice(),
+    index: 0
+  }];
 
   function exec() {
     if (callStack.length === 0) {
@@ -292,12 +468,8 @@ function startGame() {
         setTimeout(exec, 400);
         return;
       }
-  
-      callStack.push({
-        program: functionCommands.slice(),
-        index: 0
-      });
-      frame.index++; 
+      callStack.push({ program: functionCommands.slice(), index: 0 });
+      frame.index++;
       setTimeout(exec, 400);
       return;
     }
@@ -308,10 +480,7 @@ function startGame() {
         setTimeout(exec, 400);
         return;
       }
-      callStack.push({
-        program: function2Commands.slice(),
-        index: 0
-      });
+      callStack.push({ program: function2Commands.slice(), index: 0 });
       frame.index++;
       setTimeout(exec, 400);
       return;
@@ -334,7 +503,7 @@ function startGame() {
 
     const onPath = currentPathCoords.some(p => p.x === np.x && p.y === np.y);
     if (!onPath) {
-      showFail('Cube left the path!');
+      showFail(t('cube_left_path'));
       return;
     }
 
@@ -356,7 +525,11 @@ function updateRecursiveButtonsVisibility() {
   });
 }
 
-function checkWin(p) { if (p.x === endPos.x && p.y === endPos.y) showWin(); else showFail('Did not reach B!'); }
+function checkWin(p) {
+  if (p.x === endPos.x && p.y === endPos.y) showWin();
+  else showFail(t('not_reach_b'));
+}
+
 let currentPhaseData = {};
 
 function showWin() {
@@ -367,17 +540,15 @@ function showWin() {
   const mainProgramSize = commands.length;
   const f1Size = functionCommands.length;
   const f2Size = function2Commands.length;
-
-
   const totalCommands = mainProgramSize + f1Size + f2Size;
 
   currentPhaseData = { phase, totalCommands, timeTaken };
 
   document.getElementById('name-phase-num').textContent = phase;
   document.getElementById('name-stats').innerHTML = `
-    Code size: <strong>${totalCommands}</strong> commands<br>
-    Time: <strong>${timeTaken}s</strong>
-  `;
+        ${t('code_size')}: <strong>${totalCommands}</strong> ${t('commands_unit')}<br>
+        ${t('time_label')}: <strong>${timeTaken}s</strong>
+    `;
   document.getElementById('player-name-input').value = localStorage.getItem('playerName') || '';
 
   document.getElementById('name-entry-modal').style.display = 'flex';
@@ -390,34 +561,31 @@ function showWin() {
     }
   });
 
-  document.getElementById('result-title').textContent = 'Phase Complete!';
-  document.getElementById('result-message').innerHTML = `
-    Code size: <strong>${totalCommands}</strong> commands<br>
-    Time: <strong>${timeTaken}s</strong>
-  `;
+  document.getElementById('result-title').textContent = t('phase_complete');
+  document.getElementById('result-message').innerHTML = document.getElementById('name-stats').innerHTML;
   document.getElementById('next-btn').style.display = 'inline-block';
 
   const next = phaseProgress.current + 1;
   if (!phaseProgress.unlocked.includes(next) && phases[next - 1]) {
     phaseProgress.unlocked.push(next);
-    document.getElementById(`phase-${next}-btn`)?.classList.remove('locked');
+    const nextBtn = document.getElementById(`phase-${next}-btn`);
+    if (nextBtn) nextBtn.classList.remove('locked');
   }
   document.getElementById('result-modal').style.display = 'block';
+  updateTexts();
 }
 
-//  Submit name and save to leaderboard
 function submitPlayerName() {
   let playerName = document.getElementById('player-name-input').value.trim();
-  
-  
+
   if (containsBadWord(playerName)) {
-    alert("That name contains inappropriate words.");
+    alert(t('inappropriate_name'));
     return;
   }
 
-  playerName = playerName.substring(0, 15); 
+  playerName = playerName.substring(0, 15);
   if (!playerName) {
-    alert('Please enter a name!');
+    alert(t('enter_name_alert'));
     return;
   }
 
@@ -436,34 +604,34 @@ function submitPlayerName() {
 
   closeNameModal();
 }
+
 function containsBadWord(name) {
   const lowered = name.toLowerCase();
   const badWords = [
-    // English
     'fuck', 'shit', 'cunt', 'nigger', 'nigga', 'fag', 'retard', 'bitch',
     'pussy', 'dick', 'cock', 'asshole', 'whore', 'slut',
-    // Common variations & spaces/leetspeak
     'f u c k', 'f*ck', 'fu ck', 'fück', 'phuck', 'fuk',
     'sh1t', 'sh*t', 's h i t',
     'nigg', 'n1gger', 'n igger',
-    // Spanish / Portuguese (common in global games)
     'puta', 'mierda', 'joder', 'polla', 'coño', 'cago', 'caca',
     'caralho', 'porra', 'cu', 'buceta', 'pau',
-    
   ];
 
   return badWords.some(word => lowered.includes(word));
 }
+
 function closeNameModal() {
   document.getElementById('name-entry-modal').style.display = 'none';
 }
 
 function showFail(msg) {
   isAnimating = false;
-  document.getElementById('result-title').textContent = 'Failed';
+  document.getElementById('result-title').textContent = t('failed');
   document.getElementById('result-message').textContent = msg;
   document.getElementById('next-btn').style.display = 'none';
   document.getElementById('result-modal').style.display = 'block';
+  const startBtn = document.getElementById('start-btn');
+  if (startBtn) startBtn.textContent = t('start_game');
 }
 
 function nextPhase() {
@@ -482,10 +650,31 @@ function closeModal() {
 
 function showBasicTutorial() {
   document.querySelector('#tutorial-modal .modal-content').innerHTML = `
-    <span class="close" onclick="closeTutorial()">&times;</span>
-    <h3>How to Play</h3>
-    <p>Click direction buttons to build a command sequence. Cube must stay on <strong>white path</strong> and reach <strong>B (red)</strong>. Hit "Start" to run!<br><br>Forward/back OK, but <strong>no leaving path</strong>!</p>
-  `;
+        <span class="close" onclick="closeTutorial()">&times;</span>
+        <h3>${t('tutorial_basic_title')}</h3>
+        <p>${t('tutorial_basic_text')}</p>
+        <button onclick="closeTutorial()" class="green-btn" style="margin-top: 15px;">${t('got_it')}</button>
+    `;
+  showTutorial();
+}
+
+function showPhase3Tutorial() {
+  document.querySelector('#tutorial-modal .modal-content').innerHTML = `
+        <span class="close" onclick="closeTutorial()">&times;</span>
+        <h3>${t('tutorial_phase3_title')}</h3>
+        ${t('tutorial_phase3_text')}
+        <button onclick="closeTutorial()" class="green-btn" style="margin-top: 15px;">${t('got_it')}</button>
+    `;
+  showTutorial();
+}
+
+function showPhase7Tutorial() {
+  document.querySelector('#tutorial-modal .modal-content').innerHTML = `
+        <span class="close" onclick="closeTutorial()">&times;</span>
+        <h3>${t('tutorial_phase7_title')}</h3>
+        ${t('tutorial_phase7_text')}
+        <button onclick="closeTutorial()" class="green-btn" style="margin-top: 15px;">${t('got_it')}</button>
+    `;
   showTutorial();
 }
 
@@ -502,33 +691,6 @@ function closeTutorial() {
   document.getElementById('tutorial-modal').style.display = 'none';
 }
 
-function showPhase3Tutorial() {
-  document.querySelector('#tutorial-modal .modal-content').innerHTML = `
-    <span class="close" onclick="closeTutorial()">&times;</span>
-    <h3>New: FUNCTION (F)</h3>
-    <p>You now have only <strong>5 main commands</strong>!</p>
-    <p>Use the orange <strong>FUNCTION box</strong>:<br>
-    • Add moves with the small arrows<br>
-    • Press the orange <strong>F</strong> button to use it<br>
-    • You can use F multiple times!</p>
-    <p><strong>Solve Phase 3 with ≤5 main commands!</strong></p>
-  `;
-  showTutorial();
-}
-function showPhase7Tutorial() {
-  document.querySelector('#tutorial-modal .modal-content').innerHTML = `
-    <span class="close" onclick="closeTutorial()">&times;</span>
-    <h3>New: FUNCTION 2 (F2)</h3>
-    <p>Now, you have two <strong>FUNCTIONS boxes</strong>:<br>
-    • Press the orange <strong>F1</strong> or <strong>F2</strong> button to use them<br>
-    • You can call function 2 on function 1 and call function 1 on Function 2, </p>
-    • <strong>BUT BE CAREFUL</strong> you dont want be stuck in infinite loop!</p>
-    • Is not mandatory to use it, but will help you!</p>
-    <p><strong>Solve Phase 7 !</strong></p>
-  `;
-  showTutorial();
-}
-// Phase Selection
 function showPhaseSelection() {
   const buttons = document.getElementById('phase-selection-buttons');
   buttons.innerHTML = '';
@@ -536,9 +698,9 @@ function showPhaseSelection() {
     const btn = document.createElement('button');
     btn.className = 'start-phase-btn' + (phaseProgress.unlocked.includes(phase.id) ? ' unlocked' : ' locked');
     btn.innerHTML = `
-      <img src="images/phase${phase.id}.png" alt="Phase ${phase.id}" onerror="this.src='placeholder.png';">
-      <span>Phase ${phase.id}</span>
-    `;
+            <img src="images/phase${phase.id}.png" alt="${t('phase')} ${phase.id}" onerror="this.src='placeholder.png';">
+            <span>${t('phase')} ${phase.id}</span>
+        `;
     if (phaseProgress.unlocked.includes(phase.id)) {
       btn.onclick = () => {
         closePhaseSelection();
@@ -548,12 +710,13 @@ function showPhaseSelection() {
     buttons.appendChild(btn);
   });
   document.getElementById('phase-selection-modal').style.display = 'flex';
+  updateTexts();
 }
 
 function closePhaseSelection() {
   document.getElementById('phase-selection-modal').style.display = 'none';
 }
-// GLOBAL RANKINGS 
+
 function showGlobalRankings() {
   const existing = document.getElementById('global-rank-container');
   if (existing) {
@@ -573,35 +736,31 @@ function showGlobalRankings() {
   modal.className = 'modal';
   modal.style.cssText = 'display:flex; opacity:0;';
   modal.innerHTML = `
-  <div class="modal-content">
-    <span class="close" onclick="document.getElementById('global-rank-container').remove()">×</span>
-    <div class="scroll-area">
-      <h2>Global Rankings</h2>
-     <select id="ranking-phase-select" onchange="showRanking(this.value)" class="phase-select" style="margin:15px 0; padding:10px; font-size:1em; width:100%; max-width:300px;">
-                ${phases.map(p => `<option value="${p.id}" ${p.id === 1 ? 'selected' : ''}>Phase ${p.id}${p.name ? ' – ' + p.name : ''}</option>`).join('')}
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('global-rank-container').remove()">×</span>
+        <div class="scroll-area">
+            <h2>${t('global_rankings')}</h2>
+            <select id="ranking-phase-select" onchange="showRanking(this.value)" class="phase-select" style="margin:15px 0; padding:10px; font-size:1em; width:100%; max-width:300px;">
+                ${phases.map(p => `<option value="${p.id}" ${p.id === 1 ? 'selected' : ''}>${t('phase')} ${p.id}${p.name ? ' – ' + p.name : ''}</option>`).join('')}
             </select>
-      <div id="global-ranking-list" class="ranking-list"></div>
-      <button onclick="document.getElementById('global-rank-container').remove()" class="green-btn close-btn">Close</button>
+            <div id="global-ranking-list" class="ranking-list"></div>
+            <button onclick="document.getElementById('global-rank-container').remove()" class="green-btn close-btn">${t('close')}</button>
+        </div>
     </div>
-  </div>
-`;
-
+    `;
 
   document.body.appendChild(modal);
 
-  // Fade in animation
   setTimeout(() => {
     modal.style.opacity = '1';
     modal.querySelector('.modal-content').style.transform = 'scale(1)';
   }, 10);
 
-
   showRanking(1);
+  updateTexts();
 }
 
-
 function showRanking(phase) {
-  console.trace("showRanking called with phase:", phase);
   const phaseNum = parseInt(phase, 10) || 1;
   const isGlobal = !!document.getElementById('global-ranking-list');
   const listId = isGlobal ? 'global-ranking-list' : 'ranking-list';
@@ -618,11 +777,11 @@ function showRanking(phase) {
         modal.querySelector('.modal-content').style.transform = 'scale(1)';
       }, 10);
       const title = document.getElementById('ranking-title');
-      if (title) title.textContent = `Phase ${phaseNum} Ranking`;
+      if (title) title.textContent = `${t('phase')} ${phaseNum} Ranking`;
     }
   }
 
-  list.innerHTML = '<p class="loading-text">Loading rankings...</p>';
+  list.innerHTML = `<p class="loading-text">${t('loading_rankings')}</p>`;
 
   const myName = (localStorage.getItem('playerName') || '').trim();
   const oldBox = document.getElementById('your-rank-box');
@@ -635,7 +794,7 @@ function showRanking(phase) {
     .get()
     .then(snapshot => {
       if (snapshot.empty) {
-        list.innerHTML = '<p class="no-records-text">No records yet!<br>Be the first in the world!</p>';
+        list.innerHTML = `<p class="no-records-text">${t('no_records')}</p>`;
         return;
       }
 
@@ -658,7 +817,7 @@ function showRanking(phase) {
 
           html += `<tr class="${rowClass}">
                         <td>${medal}</td>
-                        <td><strong>${r.name}${myName && r.name === myName ? ' (You)' : ''}</strong></td>
+                        <td><strong>${r.name}${myName && r.name === myName ? ' (' + t('your_rank_you') + ')' : ''}</strong></td>
                         <td>${r.commands}</td>
                         <td>${r.time}s</td>
                     </tr>`;
@@ -671,7 +830,6 @@ function showRanking(phase) {
       html += '</tbody></table>';
       list.innerHTML = html;
 
-      // Row animation
       list.querySelectorAll('.ranking-row').forEach((row, i) => {
         setTimeout(() => {
           row.style.opacity = '1';
@@ -679,7 +837,6 @@ function showRanking(phase) {
         }, i * 100);
       });
 
-      // RANK 
       if (yourRank) {
         const box = document.createElement('div');
         box.id = 'your-rank-box';
@@ -688,7 +845,7 @@ function showRanking(phase) {
                         <div style="font-size:2.8em; font-weight:bold; color:#00ff88;">
                             ${yourRank <= 3 ? ['1st', '2nd', '3rd'][yourRank - 1] : '#' + yourRank}
                         </div>
-                        <div style="font-size:1.4em; margin:8px 0;"><strong>You: ${yourData.name}</strong></div>
+                        <div style="font-size:1.4em; margin:8px 0;"><strong>${t('your_rank_you')}: ${yourData.name}</strong></div>
                         <div style="color:#ccc;">${yourData.commands} commands • ${yourData.time}s</div>
                     </div>
                 `;
@@ -697,7 +854,7 @@ function showRanking(phase) {
     })
     .catch(err => {
       console.error("Leaderboard error:", err);
-      list.innerHTML = '<p class="error-text">Error loading rankings!</p>';
+      list.innerHTML = `<p class="error-text">${t('error_loading')}</p>`;
     });
 }
 
@@ -712,6 +869,7 @@ function updateGlobalRankDisplay(rank) {
     }
   });
 }
+
 window.addEventListener('load', () => {
   document.getElementById('game-screen').classList.remove('active');
   document.getElementById('start-screen').classList.add('active');
@@ -724,7 +882,22 @@ window.addEventListener('load', () => {
   const activeBtn = document.getElementById(`phase-${current}-btn`);
   if (activeBtn) activeBtn.classList.add('active');
 
-  // Optional: Auto-open phase selection instead of start screen
-  // showPhaseSelection();
   updateRecursiveButtonsVisibility();
+
+  // Configura o seletor de idioma (no menu principal)
+  const select = document.getElementById('language-select');
+  if (select) {
+    select.value = currentLang;
+    select.addEventListener('change', (e) => {
+      currentLang = e.target.value;
+      localStorage.setItem('lang', currentLang);
+      updateTexts();
+      // Atualiza textos que podem estar visíveis
+      updateCommandDisplay();
+      const startBtn = document.getElementById('start-btn');
+      if (startBtn && !isAnimating) startBtn.textContent = t('start_game');
+    });
+  }
+
+  updateTexts();
 });

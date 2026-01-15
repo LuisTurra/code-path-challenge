@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Path Challenge</title>
+    <title data-i18n="title">Code Path Challenge</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -28,14 +28,16 @@
     <div id="tutorial-modal" class="modal">
                 <div class="modal-content">
                                     <span class="close" onclick="closeTutorial()">&times;</span>
-                        <h3>How to Play</h3>
-                        <p>Click direction buttons to build a command sequence. Cube must stay on <strong>white
+                        <h3 data-i18n="how_to_play_title">How to Play</h3>
+                        <p data-i18n="tutorial_basic_text">Click direction buttons to build a command sequence. Cube
+                must stay on <strong>white
                     path</strong> and
                                 reach <strong>B (red)</strong>. Hit "Start" to run!<br><br>Forward/back OK, but
                 <strong>no leaving
                                         path</strong>!
             </p>
-                                    <button onclick="closeTutorial()" class="green-btn" style="margin-top: 15px;">Got
+                                    <button onclick="closeTutorial()" class="green-btn" style="margin-top: 15px;"
+                data-i18n="got_it">Got
                 It!</button>
                     </div>
             </div>
@@ -43,14 +45,34 @@
     <!-- Start Screen  -->
     <div id="start-screen" class="screen active">
         <div id="start-background"></div>
-        <h1>Code Path Challenge</h1>
-        <p>Guide the cube from A to B using direction commands!</p>
+        <h1 data-i18n="title">Code Path Challenge</h1>
+        <p data-i18n="subtitle">Guide the cube from A to B using direction commands!</p>
 
         <!-- Menu Buttons  -->
         <div id="start-menu-buttons" class="menu-buttons-stack">
-            <button onclick="startPhase(1)" class="menu-btn green-btn">▶ Start (Phase 1)</button>
-            <button onclick="showPhaseSelection()" class="menu-btn green-btn">Phases</button>
-            <button onclick="showGlobalRankings()" class="menu-btn green-btn">Rankings</button>
+            <button onclick="startPhase(1)" class="menu-btn green-btn"><span data-i18n="start_game">Start (Phase
+                    1)</span></button>
+            <button onclick="showPhaseSelection()" class="menu-btn green-btn" data-i18n="phases">phase</button>
+            <button onclick="showGlobalRankings()" class="menu-btn green-btn" data-i18n="rankings">Rankings</button>
+        </div>
+        <div id="language-selector" style="margin-top: 30px; text-align: center; color: white;">
+            <label for="language-select" style="margin-right: 10px; font-size: 1.2em;">Idioma / Language:</label>
+            <select id="language-select"
+                style="padding: 10px; font-size: 1.1em; border-radius: 8px; border: 2px solid #00ff88; background: #001a0d; color: white;">
+                <option value="en">English</option>
+                <option value="pt">Português (BR)</option>
+            </select>
+        </div>
+        <div id="kofi-support" style="margin-top: 30px; text-align: center;">
+            <a href="https://ko-fi.com/SEUUSERNAME" target="_blank"
+                style="display: inline-flex; align-items: center; gap: 12px; padding: 12px 24px; background: #00b9fe; color: white; border-radius: 12px; font-size: 1.2em; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <img src="https://storage.ko-fi.com/cdn/kofi2.png" alt="Ko-fi" style="height: 36px; border: 0;">
+                <span data-i18n="kofi_button">Apoie no Ko-fi ☕</span>
+            </a>
+            <p style="margin-top: 12px; font-size: 0.95em; color: #ccc;" data-i18n="kofi_message">
+                Se você gostou do jogo e puder apoiar o desenvolvimento, considere comprar um café virtual! (Totalmente
+                opcional ❤️)
+            </p>
         </div>
     </div>
 
@@ -58,11 +80,11 @@
     <div id="phase-selection-modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closePhaseSelection()">&times;</span>
-            <h2>Select Phase</h2>
+            <h2 data-i18n="select_phase">Select Phase</h2>
             <div id="phase-selection-buttons">
 
             </div>
-            <button onclick="showStartScreen()" class="green-btn">Back to Menu</button>
+            <button onclick="showStartScreen()" class="green-btn" data-i18n="back_to_menu">Back to Menu</button>
         </div>
     </div>
     <!-- Entry Name -->
@@ -70,7 +92,8 @@
     <div id="name-entry-modal">
         <div class="name-wrapper">
             <div class="name-content">
-                <h3>Phase <span id="name-phase-num"></span> Completed!</h3>
+                <h3><span data-i18n="phase">Phase</span> <span id="name-phase-num"></span> <span
+                        data-i18n="completed">Completed!</span></h3>
 
                 <div id="name-stats" style="margin: 20px 0; font-size: 1.3em; line-height: 1.6;">
 
@@ -86,9 +109,10 @@
                 </div>
 
                 <div class="name-buttons">
-                    <button onclick="submitPlayerName()" class="green-btn">Submit to Leaderboard</button>
+                    <button onclick="submitPlayerName()" class="green-btn" data-i18n="submit_leaderboard">Submit to
+                        Leaderboard</button>
                     <button onclick="closeNameModal()" class="green-btn"
-                        style="background: #444; border: 2px solid #666;">
+                        style="background: #444; border: 2px solid #666;" data-i18n="skip">
                         Skip
                     </button>
                 </div>
@@ -98,21 +122,29 @@
     <!-- Game Screen -->
     <div id="game-screen" class="screen">
         <div id="phase-nav">
-            <button id="phase-1-btn" class="phase-btn active" onclick="startPhase(1)">Phase 1</button>
-            <button id="phase-2-btn" class="phase-btn locked" onclick="startPhase(2)">Phase 2
-                <span>LOCKED</span></button>
-            <button id="phase-3-btn" class="phase-btn locked" onclick="startPhase(3)">Phase 3
-                <span>LOCKED</span></button>
-            <button id="phase-4-btn" class="phase-btn locked" onclick="startPhase(4)">Phase 4
-                <span>LOCKED</span></button>
-            <button id="phase-5-btn" class="phase-btn locked" onclick="startPhase(5)">Phase 5
-                <span>LOCKED</span></button>
-            <button id="phase-6-btn" class="phase-btn locked" onclick="startPhase(6)">Phase 6
-                <span>LOCKED</span></button>
-            <button id="phase-7-btn" class="phase-btn locked" onclick="startPhase(7)">Phase 7
-                <span>LOCKED</span></button>
-            <button id="phase-8-btn" class="phase-btn locked" onclick="startPhase(8)">Phase 8
-                <span>LOCKED</span></button>
+            <button id="phase-1-btn" class="phase-btn active" onclick="startPhase(1)"><span
+                    data-i18n="phase">Phase</span> 1</button>
+            <button id="phase-2-btn" class="phase-btn locked" onclick="startPhase(2)"><span
+                    data-i18n="phase">Phase</span> 2
+                <span class="locked-text" data-i18n="locked">LOCKED</span></button>
+            <button id="phase-3-btn" class="phase-btn locked" onclick="startPhase(3)"><span
+                    data-i18n="phase">Phase</span> 3
+                <span class="locked-text" data-i18n="locked">LOCKED</span></button>
+            <button id="phase-4-btn" class="phase-btn locked" onclick="startPhase(4)"><span
+                    data-i18n="phase">Phase</span> 4
+                <span class="locked-text" data-i18n="locked">LOCKED</span></button>
+            <button id="phase-5-btn" class="phase-btn locked" onclick="startPhase(5)"><span
+                    data-i18n="phase">Phase</span> 5
+                <span class="locked-text" data-i18n="locked">LOCKED</span></button>
+            <button id="phase-6-btn" class="phase-btn locked" onclick="startPhase(6)"><span
+                    data-i18n="phase">Phase</span> 6
+                <span class="locked-text" data-i18n="locked">LOCKED</span></button>
+            <button id="phase-7-btn" class="phase-btn locked" onclick="startPhase(7)"><span
+                    data-i18n="phase">Phase</span> 7
+                <span class="locked-text" data-i18n="locked">LOCKED</span></button>
+            <button id="phase-8-btn" class="phase-btn locked" onclick="startPhase(8)"><span
+                    data-i18n="phase">Phase</span> 8
+                <span class="locked-text" data-i18n="locked">LOCKED</span></button>
         </div>
 
         <div id="game-row">
@@ -144,8 +176,8 @@
 
                     <!-- Action buttons -->
                     <div class="action-row">
-                        <button onclick="startGame()" id="start-btn">Start</button>
-                        <button onclick="resetGame()">Reset</button>
+                        <button onclick="startGame()" id="start-btn" data-i18n="start_game">Start</button>
+                        <button onclick="resetGame()" data-i18n="reset">Reset</button>
                     </div>
 
                     <div class="action-row" style="justify-content:center;">
@@ -162,12 +194,14 @@
             </div>
             <div id="function-box" style="display:none;">
                 <div style="color:#ffaa00;font-weight:bold;margin-bottom:8px;">
-                    FUNCTION (F1):
+                    <span data-i18n="function_f1">FUNCTION (F1):</span>
                     <button onclick="clearFunction()"
-                        style="float:right;background:#cc0000;color:#fff;border:none;padding:4px 8px;font-size:12px;border-radius:6px;cursor:pointer;">Clear</button>
+                        style="float:right;background:#cc0000;color:#fff;border:none;padding:4px 8px;font-size:12px;border-radius:6px;cursor:pointer;"
+                        data-i18n="clear">Clear</button>
                 </div>
                 <div id="func-limit-text">
-                    You have only <span id="func-limit-number">4</span> function commands
+                    <span data-i18n="you_have_only">You have only</span> <span id="func-limit-number">4</span> <span
+                        data-i18n="function_commands"> function commands</span>
                 </div>
                 <div id="function-commands"><span style="color:#666">[]</span></div>
                 <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
@@ -188,12 +222,14 @@
             <!-- Function 2 Box -->
             <div id="function2-box" style="display:none;">
                 <div style="color:#ffaa00;font-weight:bold;margin-bottom:8px;">
-                    FUNCTION 2 (F2):
+                    <span data-i18n="function_f2">FUNCTION 2 (F2):</span>
                     <button onclick="clearFunction2()"
-                        style="float:right;background:#cc0000;color:#fff;border:none;padding:4px 8px;font-size:12px;border-radius:6px;cursor:pointer;">Clear</button>
+                        style="float:right;background:#cc0000;color:#fff;border:none;padding:4px 8px;font-size:12px;border-radius:6px;cursor:pointer;"
+                        data-i18n="clear">Clear</button>
                 </div>
                 <div id="func2-limit-text">
-                    You have only <span id="func2-limit-number">4</span> function commands
+                    You have only <span id="func2-limit-number">4</span> <span data-i18n="function_commands"> function
+                        commands</span>
                 </div>
                 <div id="function2-commands"><span style="color:#666">[]</span></div>
                 <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
@@ -215,7 +251,8 @@
 
         <!-- Command limit  -->
         <div id="command-limit-text" style="color:#ffaa00;font-weight:bold;margin:10px 0;display:none;">
-            You have only <span id="limit-number">4</span> main commands – use FUNCTION (F) wisely!
+            <span data-i18n="you_have_only">You have only</span> <span id="limit-number">4</span> <span
+                data-i18n="main_commands"> main commands – use FUNCTION (F) wisely!</span>
         </div>
 
         <div id="command-list"></div>
@@ -227,12 +264,14 @@
         <div id="result-modal">
             <div class="result-wrapper">
                 <div class="result-content">
-                    <h3 id="result-title">Phase Complete!</h3>
+                    <h3 id="result-title" data-i18n="phase_complete">Phase Complete!</h3>
                     <div id="result-message" style="font-size:1.3em; margin:20px 0; line-height:1.5;"></div>
 
                     <div class="result-buttons">
-                        <button id="next-btn" onclick="nextPhase()" class="green-btn">Next Phase</button>
-                        <button onclick="resetGame(); closeModal();" class="green-btn">Play Again</button>
+                        <button id="next-btn" onclick="nextPhase()" class="green-btn" data-i18n="next_phase">Next
+                            Phase</button>
+                        <button onclick="resetGame(); closeModal();" class="green-btn" data-i18n="play_again">Play
+                            Again</button>
                     </div>
                 </div>
             </div>
@@ -240,9 +279,10 @@
         <!-- Button Ranking -->
         <div class="button-container">
             <button onclick="showRanking(currentPhase || 1)" class="green-btn">
-                View Ranking – Phase <span id="ranking-phase-num">1</span>
+                <span data-i18n="rankings">View Ranking</span> – <span data-i18n="phase">Phase</span> <span
+                    id="ranking-phase-num">1</span>
             </button>
-            <button onclick="showGlobalRankings()" class="green-btn">
+            <button onclick="showGlobalRankings()" class="green-btn" data-i18n="global_rankings">
                 View Global Rankings
             </button>
         </div>
@@ -274,7 +314,7 @@
         <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
         <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
-        
+
         <script type="module">
             let firebaseConfig = {
                 apiKey: "fake-key-so-erro-nao-quebra",
