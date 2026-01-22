@@ -64,7 +64,7 @@
             </select>
         </div>
         <div id="kofi-support" style="margin-top: 30px; text-align: center;">
-            <a href="https://ko-fi.com/SEUUSERNAME" target="_blank"
+            <a href="https://ko-fi.com/luisturra" target="_blank"
                 style="display: inline-flex; align-items: center; gap: 12px; padding: 12px 24px; background: #00b9fe; color: white; border-radius: 12px; font-size: 1.2em; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
                 <img src="https://storage.ko-fi.com/cdn/kofi2.png" alt="Ko-fi" style="height: 36px; border: 0;">
                 <span data-i18n="kofi_button">Apoie no Ko-fi ☕</span>
@@ -145,6 +145,12 @@
             <button id="phase-8-btn" class="phase-btn locked" onclick="startPhase(8)"><span
                     data-i18n="phase">Phase</span> 8
                 <span class="locked-text" data-i18n="locked">LOCKED</span></button>
+            <button id="phase-9-btn" class="phase-btn locked" onclick="startPhase(9)"><span
+                    data-i18n="phase">Phase</span> 9
+                <span class="locked-text" data-i18n="locked">LOCKED</span></button>
+            <button id="phase-10-btn" class="phase-btn locked" onclick="startPhase(10)"><span
+                    data-i18n="phase">Phase</span> 10
+                <span class="locked-text" data-i18n="locked">LOCKED</span></button>
         </div>
 
         <div id="game-row">
@@ -164,14 +170,15 @@
             <div id="controls-panel">
                 <div id="controls">
 
-                    <div class="dir-row"><button onclick="addCommand('up')" class="dir-btn"><i
+                    <div class="dir-row"><button onclick="addCommand('up')" class="dir-btn" data-dir="up"><i
                                 class="fas fa-arrow-up"></i></button></div>
                     <div class="dir-row">
-                        <button onclick="addCommand('left')" class="dir-btn"><i class="fas fa-arrow-left"></i></button>
-                        <button onclick="addCommand('right')" class="dir-btn"><i
+                        <button onclick="addCommand('left')" class="dir-btn" data-dir="left"><i
+                                class="fas fa-arrow-left"></i></button>
+                        <button onclick="addCommand('right')" class="dir-btn" data-dir="right"><i
                                 class="fas fa-arrow-right"></i></button>
                     </div>
-                    <div class="dir-row"><button onclick="addCommand('down')" class="dir-btn"><i
+                    <div class="dir-row"><button onclick="addCommand('down')" class="dir-btn" data-dir="down"><i
                                 class="fas fa-arrow-down"></i></button></div>
 
                     <!-- Action buttons -->
@@ -205,12 +212,13 @@
                 </div>
                 <div id="function-commands"><span style="color:#666">[]</span></div>
                 <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
-                    <button onclick="addToFunction('up')" class="dir-btn small"><i class="fas fa-arrow-up"></i></button>
-                    <button onclick="addToFunction('down')" class="dir-btn small"><i
+                    <button onclick="addToFunction('up')" class="dir-btn small" data-dir="up"><i
+                            class="fas fa-arrow-up"></i></button>
+                    <button onclick="addToFunction('down')" class="dir-btn small" data-dir="down"><i
                             class="fas fa-arrow-down"></i></button>
-                    <button onclick="addToFunction('left')" class="dir-btn small"><i
+                    <button onclick="addToFunction('left')" class="dir-btn small" data-dir="left"><i
                             class="fas fa-arrow-left"></i></button>
-                    <button onclick="addToFunction('right')" class="dir-btn small"><i
+                    <button onclick="addToFunction('right')" class="dir-btn small" data-dir="right"><i
                             class="fas fa-arrow-right"></i></button>
                     <button onclick="addToFunction('F2')" class="dir-btn small recursive-call-btn"
                         style="background:#ff6600; color:white; font-weight:bold;display:none;">
@@ -233,13 +241,13 @@
                 </div>
                 <div id="function2-commands"><span style="color:#666">[]</span></div>
                 <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
-                    <button onclick="addToFunction2('up')" class="dir-btn small"><i
+                    <button onclick="addToFunction2('up')" class="dir-btn small" data-dir="up"><i
                             class="fas fa-arrow-up"></i></button>
-                    <button onclick="addToFunction2('down')" class="dir-btn small"><i
+                    <button onclick="addToFunction2('down')" class="dir-btn small" data-dir="down"><i
                             class="fas fa-arrow-down"></i></button>
-                    <button onclick="addToFunction2('left')" class="dir-btn small"><i
+                    <button onclick="addToFunction2('left')" class="dir-btn small" data-dir="left"><i
                             class="fas fa-arrow-left"></i></button>
-                    <button onclick="addToFunction2('right')" class="dir-btn small"><i
+                    <button onclick="addToFunction2('right')" class="dir-btn small" data-dir="right"><i
                             class="fas fa-arrow-right"></i></button>
                     <button onclick="addToFunction2('F')" class="dir-btn small recursive-call-btn"
                         style="background:#ffaa00; color:white; font-weight:bold;display:none;">

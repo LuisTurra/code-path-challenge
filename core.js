@@ -3,7 +3,7 @@ let commands = [];
 let functionCommands = [];
 let function2Commands = [];
 let currentPathCoords = [];
-let phaseProgress = { current: 1, unlocked: [1, 2, 3, 4, 5, 6, 7, 8] };
+let phaseProgress = { current: 1, unlocked: [1] };
 let isAnimating = false;
 let mainCommandLimit = Infinity;
 let currentFunctionLimit = Infinity;
@@ -76,8 +76,13 @@ const translations = {
 • You can call function 2 on function 1 and call function 1 on Function 2,</p>
 <p><strong>BUT BE CAREFUL</strong> you dont want be stuck in infinite loop!</p>
 <p>• Is not mandatory to use it, but will help you!</p>
-<p><strong>Solve Phase 7!</strong></p>`
+<p><strong>Solve Phase 7!</strong></p>`,
+    tutorial_phase9_title: "New: Command Restrictions",
+    tutorial_phase9_text: `<p><strong>Ops!!</strong>, Now the boxes lacks certain commands<br>
+• My Bad, ahahaha</p>`
+
   },
+
   pt: {
     title: "Desafio Caminho do Código",
     subtitle: "Guie o cubo do ponto A até o ponto B usando os commandos direcionais!",
@@ -140,7 +145,10 @@ const translations = {
 • Você pode chamar a função 2 na função 1 e chamar a função 1 na Função 2,</p>
 <p><strong>MAS CUIDADO</strong> você não quer ficar preso em loop infinito!</p>
 <p>• Não é obrigatório usar, mas vai ajudar!</p>
-<p><strong>Resolva a Fase 7!</strong></p>`
+<p><strong>Resolva a Fase 7!</strong></p>`,
+    tutorial_phase9_title: "Novo restrições de comando",
+    tutorial_phase9_text: `<p><strong>Vixe!!!</strong>, Agora as caixa não tem alguns comandos<br>
+• Foi sem querer querendo, ahahaha</p>`
   }
 };
 
@@ -169,7 +177,7 @@ function updateTexts() {
   const tutorialBtn = document.getElementById('tutorial-btn');
   if (tutorialBtn) tutorialBtn.title = t('tutorial_title');
 
-  // Atualiza botão Start se estiver visível
+
   const startBtn = document.getElementById('start-btn');
   if (startBtn && !isAnimating) startBtn.textContent = t('start_game');
 }
@@ -204,6 +212,7 @@ function startPhase(id) {
   if (id === 1) showBasicTutorial();
   else if (id === 3) showPhase3Tutorial();
   else if (id === 7) showPhase7Tutorial();
+  else if (id === 9) showPhase9Tutorial();
 }
 
 function closeRankingModal() {
@@ -261,6 +270,7 @@ function initPhase(id) {
   updateFunctionDisplay();
   updateRecursiveButtonsVisibility();
   initGame();
+  updateDirectionButtons();
 }
 
 function initGame() {
@@ -302,6 +312,7 @@ function resetCommands() {
   isAnimating = false;
   document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('visited'));
   updateFunctionDisplay();
+  updateDirectionButtons();
 }
 
 function addCommand(dir) {
@@ -571,9 +582,11 @@ function showWin() {
     const nextBtn = document.getElementById(`phase-${next}-btn`);
     if (nextBtn) nextBtn.classList.remove('locked');
   }
+  localStorage.setItem('phaseProgress', JSON.stringify(phaseProgress));
   document.getElementById('result-modal').style.display = 'block';
   updateTexts();
 }
+
 
 function submitPlayerName() {
   let playerName = document.getElementById('player-name-input').value.trim();
@@ -677,7 +690,15 @@ function showPhase7Tutorial() {
     `;
   showTutorial();
 }
-
+function showPhase9Tutorial() {
+  document.querySelector('#tutorial-modal .modal-content').innerHTML = `
+        <span class="close" onclick="closeTutorial()">&times;</span>
+        <h3>${t('tutorial_phase9_title')}</h3>
+        ${t('tutorial_phase9_text')}
+        <button onclick="closeTutorial()" class="green-btn" style="margin-top: 15px;">${t('got_it')}</button>
+    `;
+  showTutorial();
+}
 function showTutorial() {
   document.getElementById('tutorial-modal').style.display = 'block';
 }
@@ -901,3 +922,84 @@ window.addEventListener('load', () => {
 
   updateTexts();
 });
+
+// Restrição de botões de direção por fase
+function updateDirectionButtons() {
+  const phase = phases.find(p => p.id === currentPhase);
+  console.log('Fase atual:', currentPhase);
+  console.log('disabledMainDirections:', phase.disabledMainDirections || 'nenhum');
+
+  const disabledMain = phase.disabledMainDirections || [];
+  const disabledF1 = phase.disabledF1Directions || [];
+  const disabledF2 = phase.disabledF2Directions || [];
+  // Principais
+  console.log('Botões principais encontrados:');
+  document.querySelectorAll('.dir-btn:not(.small)').forEach(btn => {
+    console.log('Botão principal:', btn.outerHTML.substring(0, 100), '→ data-dir:', btn.dataset.dir);
+    const dir = btn.dataset.dir;
+    if (disabledMain.includes(dir)) {
+      btn.style.display = 'none';
+      btn.disabled = true;
+    } else {
+      btn.style.display = '';
+      btn.disabled = false;
+    }
+  });
+  // Comandos principais (botões com .dir-btn que NÃO têm .small)
+  document.querySelectorAll('.dir-btn:not(.small)').forEach(btn => {
+    const dir = btn.dataset.dir;
+    if (disabledMain.includes(dir)) {
+      btn.style.display = 'none';
+      btn.disabled = true;
+    } else {
+      btn.style.display = '';
+      btn.disabled = false;
+    }
+  });
+
+  // Função 1 (F1) — botões dentro de #function-box
+  document.querySelectorAll('#function-box .dir-btn').forEach(btn => {
+    const dir = btn.dataset.dir;
+    if (disabledF1.includes(dir)) {
+      btn.style.display = 'none';
+      btn.disabled = true;
+    } else {
+      btn.style.display = '';
+      btn.disabled = false;
+    }
+  });
+
+  // Função 2 (F2) — botões dentro de #function2-box
+  document.querySelectorAll('#function2-box .dir-btn').forEach(btn => {
+    const dir = btn.dataset.dir;
+    if (disabledF2.includes(dir)) {
+      btn.style.display = 'none';
+      btn.disabled = true;
+    } else {
+      btn.style.display = '';
+      btn.disabled = false;
+    }
+  });
+}
+function updatePhaseButtons() {
+  document.querySelectorAll('.phase-btn, .start-phase-btn').forEach(btn => {
+    const phaseId = parseInt(btn.id.match(/\d+/)?.[0] || btn.querySelector('span')?.textContent.match(/\d+/)?.[0]);
+    if (phaseId && phaseProgress.unlocked.includes(phaseId)) {
+      btn.classList.remove('locked');
+      // Se for botão com imagem, remove o cadeado ou whatever você usa
+    } else {
+      btn.classList.add('locked');
+    }
+  });
+}
+// Carrega progresso salvo (se existir)
+const savedProgress = localStorage.getItem('phaseProgress');
+if (savedProgress) {
+  phaseProgress = JSON.parse(savedProgress);
+} else {
+  // Estado inicial padrão (pode ajustar se quiser começar só com fase 1)
+  phaseProgress = { current: 1, unlocked: [1] }; // exemplo: só fase 1 no começo
+}
+
+// Depois de carregar, atualiza os botões de fase (se estiver no menu)
+updatePhaseButtons(); // vamos criar essa função abaixo

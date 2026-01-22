@@ -417,7 +417,7 @@ button[onclick="resetGame()"]:hover,
 
 #command-list {
     min-height: 50px;
-    max-height: 50px;
+    max-height: 150px;
     width: 90vw;
     max-width: 600px;
     font-family: 'Courier New', monospace;
