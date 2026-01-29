@@ -39,6 +39,7 @@ const translations = {
     main_commands: "main commands – use FUNCTION (F) wisely!",
     phase_complete: "Phase Complete!",
     next_phase: "Next Phase",
+    select_phase: "Select Phase",
     play_again: "Play Again",
     commands_label: "Commands:",
     code_size: "Code size",
@@ -53,6 +54,7 @@ const translations = {
     global_rankings: "Global Rankings",
     rankings: "Rankings",
     close: "Close",
+    back_to_menu: "Back to Menu",
     loading_rankings: "Loading rankings...",
     no_records: "No records yet!<br>Be the first in the world!",
     error_loading: "Error loading rankings!",
@@ -60,7 +62,7 @@ const translations = {
     inappropriate_name: "That name contains inappropriate words.",
     enter_name_alert: "Please enter a name!",
     kofi_button: "Support on Ko-fi ☕",
-    kofi_message: "If you enjoyed the game and can support the development, consider buying a virtual coffee! (Totally optional ❤️)",
+    kofi_message: "If you enjoyed the game and can support, consider buying a virtual coffee! (Totally optional ❤️)",
     tutorial_basic_title: "How to Play",
     tutorial_basic_text: 'Click direction buttons to build a command sequence. Cube must stay on <strong>white path</strong> and reach <strong>B (red)</strong>. Hit "Start" to run!<br><br>Forward/back OK, but <strong>no leaving path</strong>!',
     tutorial_phase3_title: "New: FUNCTION (F)",
@@ -73,13 +75,13 @@ const translations = {
     tutorial_phase7_title: "New: FUNCTION 2 (F2)",
     tutorial_phase7_text: `<p>Now, you have two <strong>FUNCTIONS boxes</strong>:<br>
 • Press the orange <strong>F1</strong> or <strong>F2</strong> button to use them<br>
-• You can call function 2 on function 1 and call function 1 on Function 2,</p>
+• You can call function 2 on function 1 or call function 1 on Function 2,</p>
 <p><strong>BUT BE CAREFUL</strong> you dont want be stuck in infinite loop!</p>
 <p>• Is not mandatory to use it, but will help you!</p>
 <p><strong>Solve Phase 7!</strong></p>`,
     tutorial_phase9_title: "New: Command Restrictions",
-    tutorial_phase9_text: `<p><strong>Ops!!</strong>, Now the boxes lacks certain commands<br>
-• My Bad, ahahaha</p>`
+    tutorial_phase9_text: `<p><strong>Ops!!</strong>, Now lacks certain commands<br>
+`
 
   },
 
@@ -92,6 +94,7 @@ const translations = {
     phases: "Fases",
     locked: "BLOQUEADO",
     start_game: "Iniciar",
+    back_to_menu: "Voltar ao Menu",
     reset: "Reiniciar",
     running: "Executando...",
     failed: "Falhou",
@@ -103,6 +106,7 @@ const translations = {
     function_f1: "FUNÇÃO (F1):",
     function_f2: "FUNÇÃO 2 (F2):",
     clear: "Limpar",
+    select_phase: "Selecionar Fase",
     you_have_only: "Você tem apenas",
     function_commands: "comandos de função",
     main_commands: "comandos principais – use a FUNÇÃO (F) com sabedoria!",
@@ -129,7 +133,7 @@ const translations = {
     inappropriate_name: "Esse nome contém palavras inadequadas.",
     enter_name_alert: "Por favor, digite um nome!",
     kofi_button: "Apoie no Ko-fi ☕",
-    kofi_message: "Se você gostou do jogo e puder apoiar o desenvolvimento, considere comprar um café virtual! (Totalmente opcional ❤️)",
+    kofi_message: "Se você gostou do jogo e puder apoiar, considere comprar um café virtual! (Totalmente opcional ❤️)",
     tutorial_basic_title: "Como Jogar",
     tutorial_basic_text: 'Clique nos botões de direção para construir uma sequência de comandos. O cubo deve permanecer no <strong>caminho branco</strong> e alcançar <strong>B (vermelho)</strong>. Pressione "Iniciar" para executar!<br><br>Avançar/recuar OK, mas <strong>sem sair do caminho</strong>!',
     tutorial_phase3_title: "Novo: FUNÇÃO (F)",
@@ -142,13 +146,13 @@ const translations = {
     tutorial_phase7_title: "Novo: FUNÇÃO 2 (F2)",
     tutorial_phase7_text: `<p>Agora você tem duas <strong>caixas de FUNÇÕES</strong>:<br>
 • Pressione o botão laranja <strong>F1</strong> ou <strong>F2</strong> para usá-las<br>
-• Você pode chamar a função 2 na função 1 e chamar a função 1 na Função 2,</p>
+• Você pode chamar a função 2 na função 1 ou chamar a função 1 na Função 2,</p>
 <p><strong>MAS CUIDADO</strong> você não quer ficar preso em loop infinito!</p>
 <p>• Não é obrigatório usar, mas vai ajudar!</p>
 <p><strong>Resolva a Fase 7!</strong></p>`,
     tutorial_phase9_title: "Novo restrições de comando",
-    tutorial_phase9_text: `<p><strong>Vixe!!!</strong>, Agora as caixa não tem alguns comandos<br>
-• Foi sem querer querendo, ahahaha</p>`
+    tutorial_phase9_text: `<p><strong>Vixe!!!</strong>, Agora alguns comandos estão faltando<br>
+`
   }
 };
 
