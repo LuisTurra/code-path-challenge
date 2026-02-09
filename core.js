@@ -202,7 +202,7 @@ function showStartScreen() {
 }
 
 function startPhase(id) {
-  if (!phaseProgress.unlocked.includes(id)) return;
+  if (id !== 1 && !phaseProgress.unlocked.includes(id)) return;
   phaseProgress.current = id;
   currentPhase = id;
   document.getElementById('start-screen').classList.remove('active');
@@ -212,7 +212,7 @@ function startPhase(id) {
   document.getElementById('ranking-phase-num').textContent = id;
   initPhase(id);
   updateTexts();
-
+  updateRecursiveButtonsVisibility();
   if (id === 1) showBasicTutorial();
   else if (id === 3) showPhase3Tutorial();
   else if (id === 7) showPhase7Tutorial();
@@ -271,10 +271,11 @@ function initPhase(id) {
 
   functionCommands = [];
   function2Commands = [];
+  updateDirectionButtons();
   updateFunctionDisplay();
   updateRecursiveButtonsVisibility();
   initGame();
-  updateDirectionButtons();
+
 }
 
 function initGame() {
@@ -351,6 +352,7 @@ function addFunction2Command() {
 
 function addToFunction(dir) {
   if (isAnimating) return;
+  if (dir === 'F2' && currentPhase < 7) return;
   if (functionCommands.length >= functionCommandLimit) {
     alert(format(t('only_func_commands_alert'), functionCommandLimit, currentPhase));
     return;
@@ -361,6 +363,7 @@ function addToFunction(dir) {
 
 function addToFunction2(dir) {
   if (isAnimating) return;
+  if (dir === 'F' && currentPhase < 7) return;
   if (function2Commands.length >= function2CommandLimit) {
     alert(format(t('only_func_commands_alert'), function2CommandLimit, currentPhase));
     return;
@@ -587,6 +590,8 @@ function showWin() {
     if (nextBtn) nextBtn.classList.remove('locked');
   }
   localStorage.setItem('phaseProgress', JSON.stringify(phaseProgress));
+  updatePhaseButtons();
+  updateRecursiveButtonsVisibility();
   document.getElementById('result-modal').style.display = 'block';
   updateTexts();
 }
@@ -734,6 +739,7 @@ function showPhaseSelection() {
     }
     buttons.appendChild(btn);
   });
+  updatePhaseButtons();
   document.getElementById('phase-selection-modal').style.display = 'flex';
   updateTexts();
 }
@@ -992,13 +998,13 @@ function updatePhaseButtons() {
 
     if (phaseProgress.unlocked.includes(id)) {
       btn.classList.remove('locked');
-      btn.disabled = false; // garante que o botão seja clicável
+      btn.disabled = false;
     } else {
       btn.classList.add('locked');
-      btn.disabled = true;  // opcional: desabilita clique visualmente
+      btn.disabled = true;
     }
 
-    // Atualiza o botão da fase atual (ativo)
+    // Atualiza o botão da fase atual 
     if (id === phaseProgress.current) {
       btn.classList.add('active');
     } else {
@@ -1006,7 +1012,7 @@ function updatePhaseButtons() {
     }
   });
 
-  // Atualiza os botões do modal de seleção (os dinâmicos)
+  // Atualiza os botões do modal de seleção 
   document.querySelectorAll('.start-phase-btn').forEach(btn => {
     const span = btn.querySelector('span');
     if (!span) return;
@@ -1025,9 +1031,8 @@ const savedProgress = localStorage.getItem('phaseProgress');
 if (savedProgress) {
   phaseProgress = JSON.parse(savedProgress);
 } else {
-  // Estado inicial padrão 
   phaseProgress = { current: 1, unlocked: [1] };
 }
 
-// Atualiza os botões de fase 
+
 updatePhaseButtons(); 
