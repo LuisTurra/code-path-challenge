@@ -3,7 +3,7 @@ let commands = [];
 let functionCommands = [];
 let function2Commands = [];
 let currentPathCoords = [];
-let phaseProgress = { current: 1, unlocked: [1] };
+let phaseProgress = { current: 1, unlocked: [] };
 let isAnimating = false;
 let mainCommandLimit = Infinity;
 let currentFunctionLimit = Infinity;
@@ -909,7 +909,7 @@ window.addEventListener('load', () => {
 
   updateRecursiveButtonsVisibility();
 
-  // Configura o seletor de idioma (no menu principal)
+  // Configura o seletor de idioma 
   const select = document.getElementById('language-select');
   if (select) {
     select.value = currentLang;
@@ -917,7 +917,6 @@ window.addEventListener('load', () => {
       currentLang = e.target.value;
       localStorage.setItem('lang', currentLang);
       updateTexts();
-      // Atualiza textos que podem estar visíveis
       updateCommandDisplay();
       const startBtn = document.getElementById('start-btn');
       if (startBtn && !isAnimating) startBtn.textContent = t('start_game');
@@ -949,7 +948,7 @@ function updateDirectionButtons() {
       btn.disabled = false;
     }
   });
-  // Comandos principais (botões com .dir-btn que NÃO têm .small)
+  // Comandos principais 
   document.querySelectorAll('.dir-btn:not(.small)').forEach(btn => {
     const dir = btn.dataset.dir;
     if (disabledMain.includes(dir)) {
@@ -961,7 +960,7 @@ function updateDirectionButtons() {
     }
   });
 
-  // Função 1 (F1) — botões dentro de #function-box
+  // botões dentro de #function-box
   document.querySelectorAll('#function-box .dir-btn').forEach(btn => {
     const dir = btn.dataset.dir;
     if (disabledF1.includes(dir)) {
@@ -973,7 +972,7 @@ function updateDirectionButtons() {
     }
   });
 
-  // Função 2 (F2) — botões dentro de #function2-box
+  //  botões dentro de #function2-box
   document.querySelectorAll('#function2-box .dir-btn').forEach(btn => {
     const dir = btn.dataset.dir;
     if (disabledF2.includes(dir)) {
@@ -986,24 +985,49 @@ function updateDirectionButtons() {
   });
 }
 function updatePhaseButtons() {
-  document.querySelectorAll('.phase-btn, .start-phase-btn').forEach(btn => {
-    const phaseId = parseInt(btn.id.match(/\d+/)?.[0] || btn.querySelector('span')?.textContent.match(/\d+/)?.[0]);
-    if (phaseId && phaseProgress.unlocked.includes(phaseId)) {
+  document.querySelectorAll('.phase-btn').forEach(btn => {
+    const match = btn.id.match(/phase-(\d+)-btn/);
+    if (!match) return;
+    const id = parseInt(match[1]);
+
+    if (phaseProgress.unlocked.includes(id)) {
       btn.classList.remove('locked');
-      // Se for botão com imagem, remove o cadeado ou whatever você usa
+      btn.disabled = false; // garante que o botão seja clicável
     } else {
+      btn.classList.add('locked');
+      btn.disabled = true;  // opcional: desabilita clique visualmente
+    }
+
+    // Atualiza o botão da fase atual (ativo)
+    if (id === phaseProgress.current) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  // Atualiza os botões do modal de seleção (os dinâmicos)
+  document.querySelectorAll('.start-phase-btn').forEach(btn => {
+    const span = btn.querySelector('span');
+    if (!span) return;
+    const id = parseInt(span.textContent.match(/\d+/)?.[0]);
+    if (id && phaseProgress.unlocked.includes(id)) {
+      btn.classList.remove('locked');
+      btn.classList.add('unlocked');
+    } else {
+      btn.classList.remove('unlocked');
       btn.classList.add('locked');
     }
   });
 }
-// Carrega progresso salvo (se existir)
+// Carrega progresso salvo 
 const savedProgress = localStorage.getItem('phaseProgress');
 if (savedProgress) {
   phaseProgress = JSON.parse(savedProgress);
 } else {
-  // Estado inicial padrão (pode ajustar se quiser começar só com fase 1)
-  phaseProgress = { current: 1, unlocked: [1] }; // exemplo: só fase 1 no começo
+  // Estado inicial padrão 
+  phaseProgress = { current: 1, unlocked: [1] };
 }
 
-// Depois de carregar, atualiza os botões de fase (se estiver no menu)
-updatePhaseButtons(); // vamos criar essa função abaixo
+// Atualiza os botões de fase 
+updatePhaseButtons(); 

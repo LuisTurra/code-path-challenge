@@ -892,7 +892,15 @@ button[onclick="resetGame()"]:hover,
     color: #f85149;
     font-weight: bold;
 }
+/* Esconde o texto "LOCKED" por padrão */
+.phase-btn .locked-text {
+    display: none;
+}
 
+/* Mostra o texto só quando o botão tem a classe 'locked' */
+.phase-btn.locked .locked-text {
+    display: inline;
+}
 /* ──────────────────────────────────────────────────────── */
 
 
