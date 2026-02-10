@@ -57,13 +57,13 @@ Se gostou do jogo e quiser apoiar o desenvolvimento, considere um café virtual:
 Sem frameworks pesados – tudo leve e rápido!
 
 ## 📂 Estrutura do Projeto
-/
-├── index.html          # Página principal
-├── styles.css          # Estilos
-├── script.js           # Lógica do jogo
-├── phases.js           # Definições das fases
-├── images/             # Imagens das fases, ícones, etc.
-└── README.md           # Este arquivo
+    /
+    ├── index.html          # Página principal
+    ├── styles.css          # Estilos
+    ├── script.js           # Lógica do jogo
+    ├── phases.js           # Definições das fases
+    ├── images/             # Imagens das fases, ícones, etc.
+    └── README.md           # Este arquivo
 
 ## 🤝 Contribuições
 
