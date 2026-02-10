@@ -44,7 +44,7 @@ Mude o idioma no menu.
 ## ☕ Apoie o Projeto
 
 Se gostou do jogo e quiser apoiar o desenvolvimento, considere um café virtual:  
-[![Ko-fi](https://ko-fi.com/img/githubbtn_sm.svg)] (https://ko-fi.com/luisturra)  
+[![Ko-fi](https://ko-fi.com/img/githubbtn_sm.svg)](https://ko-fi.com/luisturra)  
 
 
 ## 🛠️ Tecnologias Usadas
