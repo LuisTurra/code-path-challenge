@@ -9,6 +9,10 @@ let mainCommandLimit = Infinity;
 let currentFunctionLimit = Infinity;
 let currentPhase = 1;
 let gameStartTime = 0;
+const RATIO_OFFSET = 4 / 64;      
+const RATIO_INNER = 56 / 64;      
+const RATIO_FONT = 24 / 64;       
+const RATIO_RADIUS = 14 / 64;     
 
 // ==== SISTEMA DE TRADUÇÃO ====
 let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('pt') ? 'pt' : 'en');
@@ -188,9 +192,9 @@ function updateTexts() {
 
 // ===================================
 
-function getScaledCellSize() {
-  const cellElement = document.querySelector('.grid-cell');
-  return cellElement ? cellElement.offsetWidth : 64;
+function getCellSize() {
+  const cell = document.querySelector('.grid-cell');
+  return cell ? cell.offsetWidth : 64;
 }
 
 function showStartScreen() {
@@ -277,7 +281,39 @@ function initPhase(id) {
   initGame();
 
 }
+function repositionElements() {
+  const cellSize = getCellSize();
+  const offset = cellSize * RATIO_OFFSET;
+  const innerSize = cellSize * RATIO_INNER;
+  const fontSize = cellSize * RATIO_FONT;
+  const radius = cellSize * RATIO_RADIUS;
 
+  // Cube
+  const cube = document.getElementById('cube');
+  cube.style.width = `${innerSize}px`;
+  cube.style.height = `${innerSize}px`;
+  cube.style.borderRadius = `${radius}px`;
+  cube.style.left = `${cubePos.x * cellSize + offset}px`;
+  cube.style.top = `${cubePos.y * cellSize + offset}px`;
+
+  // Ponto de início (A)
+  const startPoint = document.getElementById('start-point');
+  startPoint.style.width = `${innerSize}px`;
+  startPoint.style.height = `${innerSize}px`;
+  startPoint.style.borderRadius = `${radius}px`;
+  startPoint.style.fontSize = `${fontSize}px`;
+  startPoint.style.left = `${cubePos.x * cellSize + offset}px`;
+  startPoint.style.top = `${cubePos.y * cellSize + offset}px`;
+
+  // Ponto de fim (B)
+  const endPoint = document.getElementById('end-point');
+  endPoint.style.width = `${innerSize}px`;
+  endPoint.style.height = `${innerSize}px`;
+  endPoint.style.borderRadius = `${radius}px`;
+  endPoint.style.fontSize = `${fontSize}px`;
+  endPoint.style.left = `${endPos.x * cellSize + offset}px`;
+  endPoint.style.top = `${endPos.y * cellSize + offset}px`;
+}
 function initGame() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
@@ -293,15 +329,8 @@ function initGame() {
   currentPathCoords.forEach(p => {
     document.querySelector(`.grid-cell[data-x="${p.x}"][data-y="${p.y}"]`).classList.add('path');
   });
-  const currentCellSize = getScaledCellSize();
-  const o = 4;
 
-  document.getElementById('cube').style.left = `${cubePos.x * currentCellSize + o}px`;
-  document.getElementById('cube').style.top = `${cubePos.y * currentCellSize + o}px`;
-  document.getElementById('start-point').style.left = `${cubePos.x * currentCellSize + o}px`;
-  document.getElementById('start-point').style.top = `${cubePos.y * currentCellSize + o}px`;
-  document.getElementById('end-point').style.left = `${endPos.x * currentCellSize + o}px`;
-  document.getElementById('end-point').style.top = `${endPos.y * currentCellSize + o}px`;
+  repositionElements(); 
   resetCommands();
 }
 
@@ -510,7 +539,7 @@ function startGame() {
     });
   }
 
-  const currentCellSize = getScaledCellSize();
+
 
   function move(dir, cb) {
     let np = { ...pos };
@@ -526,8 +555,13 @@ function startGame() {
     }
 
     pos = np;
-    document.getElementById('cube').style.left = `${pos.x * currentCellSize + 4}px`;
-    document.getElementById('cube').style.top = `${pos.y * currentCellSize + 4}px`;
+
+    const cellSize = getCellSize();
+    const offset = cellSize * RATIO_OFFSET;
+
+    document.getElementById('cube').style.left = `${pos.x * cellSize + offset}px`;
+    document.getElementById('cube').style.top = `${pos.y * cellSize + offset}px`;
+
     document.querySelector(`.grid-cell[data-x="${pos.x}"][data-y="${pos.y}"]`).classList.add('visited');
 
     cb();
@@ -931,7 +965,11 @@ window.addEventListener('load', () => {
 
   updateTexts();
 });
-
+window.addEventListener('resize', () => {
+  if (document.getElementById('game-screen').classList.contains('active')) {
+    repositionElements();
+  }
+});
 // Restrição de botões de direção por fase
 function updateDirectionButtons() {
   const phase = phases.find(p => p.id === currentPhase);
@@ -1035,5 +1073,5 @@ if (savedProgress) {
 }
 
 
-updatePhaseButtons(); 
+updatePhaseButtons();
 
