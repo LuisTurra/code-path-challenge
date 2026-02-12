@@ -9,10 +9,10 @@ let mainCommandLimit = Infinity;
 let currentFunctionLimit = Infinity;
 let currentPhase = 1;
 let gameStartTime = 0;
-const RATIO_OFFSET = 4 / 64;      
-const RATIO_INNER = 56 / 64;      
-const RATIO_FONT = 24 / 64;       
-const RATIO_RADIUS = 14 / 64;     
+const RATIO_OFFSET = 4 / 64;
+const RATIO_INNER = 56 / 64;
+const RATIO_FONT = 24 / 64;
+const RATIO_RADIUS = 14 / 64;
 
 // ==== SISTEMA DE TRADUÇÃO ====
 let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('pt') ? 'pt' : 'en');
@@ -203,6 +203,7 @@ function showStartScreen() {
   closeTutorial();
   closePhaseSelection();
   updateTexts();
+  updateMobilePhaseSelect()
 }
 
 function startPhase(id) {
@@ -212,15 +213,21 @@ function startPhase(id) {
   document.getElementById('start-screen').classList.remove('active');
   document.getElementById('game-screen').classList.add('active');
   document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(`phase-${id}-btn`).classList.add('active');
+  const activeBtn = document.getElementById(`phase-${id}-btn`);
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+  }
   document.getElementById('ranking-phase-num').textContent = id;
   initPhase(id);
   updateTexts();
   updateRecursiveButtonsVisibility();
+
+  adjustMobileGridPosition();
   if (id === 1) showBasicTutorial();
   else if (id === 3) showPhase3Tutorial();
   else if (id === 7) showPhase7Tutorial();
   else if (id === 9) showPhase9Tutorial();
+  updateMobilePhaseSelect();
 }
 
 function closeRankingModal() {
@@ -278,17 +285,45 @@ function initPhase(id) {
   updateDirectionButtons();
   updateFunctionDisplay();
   updateRecursiveButtonsVisibility();
+  updateMobilePhaseSelect();
   initGame();
 
 }
 function repositionElements() {
-  const cellSize = getCellSize();
-  const offset = cellSize * RATIO_OFFSET;
-  const innerSize = cellSize * RATIO_INNER;
-  const fontSize = cellSize * RATIO_FONT;
-  const radius = cellSize * RATIO_RADIUS;
+  const cellSize = getCellSize();  // mantém cálculo original (grid width / 6)
 
-  // Cube
+  let innerSize = 50;   // fallback
+  let offset = 5;       // fallback
+  let fontSize = 20;
+  let radius = 10;
+
+  if (window.innerWidth <= 1024) {
+    // FIXOS POR FAIXA (afinados pra centralizar perfeito — testados logicamente)
+    if (window.innerWidth < 400) {          // pequeno ~300px grid, cell ~50px
+      innerSize = 42;
+      offset = 4;                           // puxa exato pro centro
+      fontSize = 18;
+      radius = 8;
+    } else if (window.innerWidth < 800) {   // médio ~340px grid, cell ~56px
+      innerSize = 47;
+      offset = 4.5;                         // 4 ou 5 se precisar ajustar 1px
+      fontSize = 20;
+      radius = 10;
+    } else {                                // grande ~400px grid, cell ~66px
+      innerSize = 55;
+      offset = 5.5;                         // ajusta pra não vazar
+      fontSize = 22;
+      radius = 12;
+    }
+  } else {
+    // Desktop: volta ao proporcional original
+    innerSize = cellSize * RATIO_INNER;
+    offset = cellSize * RATIO_OFFSET;
+    fontSize = cellSize * RATIO_FONT;
+    radius = cellSize * RATIO_RADIUS;
+  }
+
+  // Aplica (cube, A, B — movimento perfeito agora)
   const cube = document.getElementById('cube');
   cube.style.width = `${innerSize}px`;
   cube.style.height = `${innerSize}px`;
@@ -296,7 +331,6 @@ function repositionElements() {
   cube.style.left = `${cubePos.x * cellSize + offset}px`;
   cube.style.top = `${cubePos.y * cellSize + offset}px`;
 
-  // Ponto de início (A)
   const startPoint = document.getElementById('start-point');
   startPoint.style.width = `${innerSize}px`;
   startPoint.style.height = `${innerSize}px`;
@@ -305,7 +339,6 @@ function repositionElements() {
   startPoint.style.left = `${cubePos.x * cellSize + offset}px`;
   startPoint.style.top = `${cubePos.y * cellSize + offset}px`;
 
-  // Ponto de fim (B)
   const endPoint = document.getElementById('end-point');
   endPoint.style.width = `${innerSize}px`;
   endPoint.style.height = `${innerSize}px`;
@@ -314,6 +347,8 @@ function repositionElements() {
   endPoint.style.left = `${endPos.x * cellSize + offset}px`;
   endPoint.style.top = `${endPos.y * cellSize + offset}px`;
 }
+
+
 function initGame() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
@@ -330,7 +365,7 @@ function initGame() {
     document.querySelector(`.grid-cell[data-x="${p.x}"][data-y="${p.y}"]`).classList.add('path');
   });
 
-  repositionElements(); 
+  repositionElements();
   resetCommands();
 }
 
@@ -347,6 +382,7 @@ function resetCommands() {
   document.querySelectorAll('.grid-cell').forEach(c => c.classList.remove('visited'));
   updateFunctionDisplay();
   updateDirectionButtons();
+  adjustMobileGridPosition();
 }
 
 function addCommand(dir) {
@@ -436,6 +472,7 @@ function updateCommandDisplay() {
     }
     list.appendChild(icon);
   });
+  adjustMobileGridPosition();
 }
 
 function updateFunctionDisplay() {
@@ -962,14 +999,21 @@ window.addEventListener('load', () => {
       if (startBtn && !isAnimating) startBtn.textContent = t('start_game');
     });
   }
-
+  updateMobilePhaseSelect();
+  adjustMobileGridPosition();
   updateTexts();
 });
 window.addEventListener('resize', () => {
   if (document.getElementById('game-screen').classList.contains('active')) {
     repositionElements();
   }
+  if (window.innerWidth <= 1024) {
+    repositionElements();  // força reposicionar quando entra no mobile
+  }
+  updateMobilePhaseSelect();
+  adjustMobileGridPosition();
 });
+
 // Restrição de botões de direção por fase
 function updateDirectionButtons() {
   const phase = phases.find(p => p.id === currentPhase);
@@ -1062,8 +1106,76 @@ function updatePhaseButtons() {
       btn.classList.remove('unlocked');
       btn.classList.add('locked');
     }
+
   });
+  updateMobilePhaseSelect();
 }
+function updateMobilePhaseSelect() {
+  const select = document.getElementById('mobile-phase-select');
+  if (!select) return;
+
+  if (window.innerWidth <= 1024) {
+    select.style.display = 'block';
+    select.innerHTML = '<option value="">' + t('select_phase') + '</option>'; // opção padrão
+
+    // Pega o número máximo de fases dos botões existentes ou de phaseProgress
+    const phaseButtons = document.querySelectorAll('.phase-btn');
+    const maxPhase = phaseButtons.length > 0
+      ? Math.max(...Array.from(phaseButtons).map(btn => {
+        const match = btn.id.match(/phase-(\d+)-btn/);
+        return match ? parseInt(match[1]) : 0;
+      }))
+      : phaseProgress.unlocked.length + 5; // fallback se não achar botões (ajuste se souber o total de fases)
+
+    for (let id = 1; id <= maxPhase; id++) {
+      const option = document.createElement('option');
+      option.value = id;
+      option.textContent = `${t('phase')} ${id}`;
+
+      // Verifica se desbloqueada (prioriza botões, fallback phaseProgress)
+      const btn = document.getElementById(`phase-${id}-btn`);
+      const isLocked = btn ? btn.classList.contains('locked') : !phaseProgress.unlocked.includes(id);
+
+      if (isLocked) {
+        option.disabled = true;
+        option.textContent += ` (${t('locked')})`;
+      }
+
+      if (id === currentPhase) {
+        option.selected = true;
+      }
+
+      select.appendChild(option);
+    }
+
+    select.onchange = function () {
+      const id = parseInt(this.value);
+      if (id && !document.getElementById(`phase-${id}-btn`)?.classList.contains('locked')) {
+        startPhase(id);
+      }
+    };
+  } else {
+    select.style.display = 'none';
+  }
+}
+
+function adjustMobileGridPosition() {
+  if (window.innerWidth > 1024) return; // só mobile
+
+  const commandList = document.getElementById('command-list');
+  const gridContainer = document.getElementById('game-container');
+
+  if (commandList && gridContainer) {
+    const commandHeight = commandList.offsetHeight || 70; // fallback 70px
+    const newTop = commandHeight + 30; // + margem/padding confortável
+    gridContainer.style.top = `${newTop}px`;
+
+    // Ajusta padding-top da screen pra não cortar o conteúdo rolável
+    document.getElementById('game-screen').style.paddingTop = `${newTop + 370}px`; // 370px ≈ altura grid reduzido + margem
+  }
+}
+
+
 // Carrega progresso salvo 
 const savedProgress = localStorage.getItem('phaseProgress');
 if (savedProgress) {
