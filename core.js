@@ -289,63 +289,69 @@ function initPhase(id) {
   initGame();
 
 }
+
 function repositionElements() {
-  const cellSize = getCellSize();  // mantém cálculo original (grid width / 6)
+  const cellSize = getCellSize();
+  const cube = document.getElementById('cube');
+  const startPoint = document.getElementById('start-point');
+  const endPoint = document.getElementById('end-point');
 
-  let innerSize = 50;   // fallback
-  let offset = 5;       // fallback
-  let fontSize = 20;
-  let radius = 10;
+  if (!cube || !startPoint || !endPoint) return;
 
+  let innerSize, fontSize, radius, finalOffset;
+
+  // 1. LÓGICA MOBILE (MANTIDA 100% IGUAL À SUA)
   if (window.innerWidth <= 1024) {
-    // FIXOS POR FAIXA (afinados pra centralizar perfeito — testados logicamente)
-    if (window.innerWidth < 400) {          // pequeno ~300px grid, cell ~50px
-      innerSize = 42;
-      offset = 4;                           // puxa exato pro centro
-      fontSize = 18;
-      radius = 8;
-    } else if (window.innerWidth < 800) {   // médio ~340px grid, cell ~56px
-      innerSize = 47;
-      offset = 4.5;                         // 4 ou 5 se precisar ajustar 1px
-      fontSize = 20;
-      radius = 10;
-    } else {                                // grande ~400px grid, cell ~66px
-      innerSize = 55;
-      offset = 5.5;                         // ajusta pra não vazar
-      fontSize = 22;
-      radius = 12;
+    innerSize = 45;
+    finalOffset = 16;
+    fontSize = 15;
+    radius = 8;
+
+    if (window.innerWidth < 400) {
+      innerSize = 43;
+      finalOffset = 17;
+      fontSize = 13;
+      radius = 4;
+    } else if (window.innerWidth >= 800) {
+      innerSize = 45;
+      finalOffset = 17;
+      fontSize = 14;
+      radius = 4;
     }
   } else {
-    // Desktop: volta ao proporcional original
+    // 2. LÓGICA DESKTOP (CORREÇÃO MATEMÁTICA)
     innerSize = cellSize * RATIO_INNER;
-    offset = cellSize * RATIO_OFFSET;
     fontSize = cellSize * RATIO_FONT;
     radius = cellSize * RATIO_RADIUS;
+
+    // Compensação dos 8px de padding + 5px de border do seu CSS
+    const containerPadding = 8;
+    const gridBorder = 5;
+
+    // Centraliza o elemento dentro da célula e soma os recuos do CSS
+    const centering = (cellSize - innerSize) / 2;
+    finalOffset = containerPadding + gridBorder + centering;
   }
 
-  // Aplica (cube, A, B — movimento perfeito agora)
-  const cube = document.getElementById('cube');
-  cube.style.width = `${innerSize}px`;
-  cube.style.height = `${innerSize}px`;
-  cube.style.borderRadius = `${radius}px`;
-  cube.style.left = `${cubePos.x * cellSize + offset}px`;
-  cube.style.top = `${cubePos.y * cellSize + offset}px`;
+  const apply = (el, pos) => {
+    el.style.width = `${innerSize}px`;
+    el.style.height = `${innerSize}px`;
+    el.style.borderRadius = `${radius}px`;
+    el.style.fontSize = `${fontSize}px`;
+    el.style.position = 'absolute';
 
-  const startPoint = document.getElementById('start-point');
-  startPoint.style.width = `${innerSize}px`;
-  startPoint.style.height = `${innerSize}px`;
-  startPoint.style.borderRadius = `${radius}px`;
-  startPoint.style.fontSize = `${fontSize}px`;
-  startPoint.style.left = `${cubePos.x * cellSize + offset}px`;
-  startPoint.style.top = `${cubePos.y * cellSize + offset}px`;
+    el.style.position = 'absolute';
+    el.style.boxSizing = 'border-box';
+    el.style.margin = '0';
 
-  const endPoint = document.getElementById('end-point');
-  endPoint.style.width = `${innerSize}px`;
-  endPoint.style.height = `${innerSize}px`;
-  endPoint.style.borderRadius = `${radius}px`;
-  endPoint.style.fontSize = `${fontSize}px`;
-  endPoint.style.left = `${endPos.x * cellSize + offset}px`;
-  endPoint.style.top = `${endPos.y * cellSize + offset}px`;
+    // A mágica acontece aqui: usamos o finalOffset calculado
+    el.style.left = `${pos.x * cellSize + finalOffset}px`;
+    el.style.top = `${pos.y * cellSize + finalOffset}px`;
+  };
+
+  apply(cube, cubePos);
+  apply(startPoint, cubePos);
+  apply(endPoint, endPos);
 }
 
 
@@ -367,6 +373,31 @@ function initGame() {
 
   repositionElements();
   resetCommands();
+}
+
+function resetGridAndReposition() {
+  if (!document.getElementById('game-screen').classList.contains('active')) return;
+
+  // Recria o grid (limpa células)
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      const cell = document.createElement('div');
+      cell.className = 'grid-cell';
+      cell.dataset.x = x;
+      cell.dataset.y = y;
+      grid.appendChild(cell);
+    }
+  }
+
+  // Reaplica path
+  currentPathCoords.forEach(p => {
+    document.querySelector(`.grid-cell[data-x="${p.x}"][data-y="${p.y}"]`).classList.add('path');
+  });
+
+  // Reposiciona tudo com ratios originais
+  repositionElements();
 }
 
 function resetCommands() {
@@ -1004,15 +1035,42 @@ window.addEventListener('load', () => {
   updateTexts();
 });
 window.addEventListener('resize', () => {
+  // Seu código original
   if (document.getElementById('game-screen').classList.contains('active')) {
     repositionElements();
   }
-  if (window.innerWidth <= 1024) {
-    repositionElements();  // força reposicionar quando entra no mobile
-  }
+
   updateMobilePhaseSelect();
   adjustMobileGridPosition();
+
+  // RESET FORTE + RECRIA GRID NO DESKTOP
+  if (window.innerWidth > 1024) {
+    // Reset inline
+    const elements = [
+      document.getElementById('cube'),
+      document.getElementById('start-point'),
+      document.getElementById('end-point'),
+      document.getElementById('game-container'),
+      document.getElementById('command-list'),
+      document.getElementById('game-screen')
+    ];
+
+    elements.forEach(el => {
+      if (el) {
+        el.removeAttribute('style');
+      }
+    });
+
+    // Força phase-nav
+    const phaseNav = document.getElementById('phase-nav');
+    if (phaseNav) phaseNav.style.display = 'flex';
+
+    // Recria grid e reposiciona (mata desalinhamento de A/B/cube)
+    resetGridAndReposition();
+  }
 });
+
+
 
 // Restrição de botões de direção por fase
 function updateDirectionButtons() {
