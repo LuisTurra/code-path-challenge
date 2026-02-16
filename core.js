@@ -308,12 +308,17 @@ function repositionElements() {
     fontSize = 15;
     radius = 8;
 
-    if (window.innerWidth < 400) {
-      innerSize = 30;
+    if (window.innerWidth < 350) {
+      innerSize = 35;
       finalOffset = 17;
       fontSize = 13;
       radius = 4;
-    } else if (window.innerWidth >= 800) {
+    } else if (window.innerWidth >= 400) {
+      innerSize = 45;
+      finalOffset = 17;
+      fontSize = 13;
+      radius = 4;
+    }else if (window.innerWidth >= 800) {
       innerSize = 45;
       finalOffset = 17;
       fontSize = 14;
@@ -1035,7 +1040,6 @@ window.addEventListener('load', () => {
   updateTexts();
 });
 window.addEventListener('resize', () => {
-  // Seu código original
   if (document.getElementById('game-screen').classList.contains('active')) {
     repositionElements();
   }
