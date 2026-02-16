@@ -13,6 +13,7 @@ const RATIO_OFFSET = 4 / 64;
 const RATIO_INNER = 56 / 64;
 const RATIO_FONT = 24 / 64;
 const RATIO_RADIUS = 14 / 64;
+let alignmentOffset = 0;
 
 // ==== SISTEMA DE TRADUÇÃO ====
 let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('pt') ? 'pt' : 'en');
@@ -300,7 +301,7 @@ function repositionElements() {
 
   let innerSize, fontSize, radius, finalOffset;
 
-  // 1. LÓGICA MOBILE (MANTIDA 100% IGUAL À SUA)
+  // 1. MOBILE
   if (window.innerWidth <= 1024) {
     innerSize = 45;
     finalOffset = 16;
@@ -308,7 +309,7 @@ function repositionElements() {
     radius = 8;
 
     if (window.innerWidth < 400) {
-      innerSize = 43;
+      innerSize = 30;
       finalOffset = 17;
       fontSize = 13;
       radius = 4;
@@ -318,19 +319,22 @@ function repositionElements() {
       fontSize = 14;
       radius = 4;
     }
+
+    alignmentOffset = finalOffset;  // <--- AQUI
+
   } else {
-    // 2. LÓGICA DESKTOP (CORREÇÃO MATEMÁTICA)
+    // 2. DESKTOP
     innerSize = cellSize * RATIO_INNER;
     fontSize = cellSize * RATIO_FONT;
     radius = cellSize * RATIO_RADIUS;
 
-    // Compensação dos 8px de padding + 5px de border do seu CSS
     const containerPadding = 8;
     const gridBorder = 5;
 
-    // Centraliza o elemento dentro da célula e soma os recuos do CSS
     const centering = (cellSize - innerSize) / 2;
     finalOffset = containerPadding + gridBorder + centering;
+
+    alignmentOffset = finalOffset;  // <--- AQUI
   }
 
   const apply = (el, pos) => {
@@ -339,12 +343,9 @@ function repositionElements() {
     el.style.borderRadius = `${radius}px`;
     el.style.fontSize = `${fontSize}px`;
     el.style.position = 'absolute';
-
-    el.style.position = 'absolute';
     el.style.boxSizing = 'border-box';
     el.style.margin = '0';
 
-    // A mágica acontece aqui: usamos o finalOffset calculado
     el.style.left = `${pos.x * cellSize + finalOffset}px`;
     el.style.top = `${pos.y * cellSize + finalOffset}px`;
   };
@@ -554,6 +555,7 @@ function startGame() {
   isAnimating = true;
   gameStartTime = Date.now();
   document.getElementById('start-btn').textContent = t('running');
+  repositionElements();
 
   let pos = { ...cubePos };
 
@@ -625,10 +627,8 @@ function startGame() {
     pos = np;
 
     const cellSize = getCellSize();
-    const offset = cellSize * RATIO_OFFSET;
-
-    document.getElementById('cube').style.left = `${pos.x * cellSize + offset}px`;
-    document.getElementById('cube').style.top = `${pos.y * cellSize + offset}px`;
+    document.getElementById('cube').style.left = `${pos.x * cellSize + alignmentOffset}px`;
+    document.getElementById('cube').style.top = `${pos.y * cellSize + alignmentOffset}px`;
 
     document.querySelector(`.grid-cell[data-x="${pos.x}"][data-y="${pos.y}"]`).classList.add('visited');
 
@@ -1168,71 +1168,89 @@ function updatePhaseButtons() {
   });
   updateMobilePhaseSelect();
 }
+
+
+
 function updateMobilePhaseSelect() {
-  const select = document.getElementById('mobile-phase-select');
-  if (!select) return;
+  const display = document.getElementById('mobile-phase-display');
+  const optionsList = document.getElementById('mobile-phase-options');
+  if (!display || !optionsList) return;
 
   if (window.innerWidth <= 1024) {
-    select.style.display = 'block';
-    select.innerHTML = '<option value="">' + t('select_phase') + '</option>'; // opção padrão
+    optionsList.innerHTML = '';
 
-    // Pega o número máximo de fases dos botões existentes ou de phaseProgress
+
+    display.onclick = () => optionsList.classList.toggle('select-hide');
+
+
     const phaseButtons = document.querySelectorAll('.phase-btn');
     const maxPhase = phaseButtons.length > 0
       ? Math.max(...Array.from(phaseButtons).map(btn => {
         const match = btn.id.match(/phase-(\d+)-btn/);
         return match ? parseInt(match[1]) : 0;
       }))
-      : phaseProgress.unlocked.length + 5; // fallback se não achar botões (ajuste se souber o total de fases)
+      : phaseProgress.unlocked.length + 5;
 
     for (let id = 1; id <= maxPhase; id++) {
-      const option = document.createElement('option');
-      option.value = id;
-      option.textContent = `${t('phase')} ${id}`;
+      const li = document.createElement('li');
+      let text = `${t('phase')} ${id}`;
 
-      // Verifica se desbloqueada (prioriza botões, fallback phaseProgress)
       const btn = document.getElementById(`phase-${id}-btn`);
-      const isLocked = btn ? btn.classList.contains('locked') : !phaseProgress.unlocked.includes(id);
+      const isLocked = btn ? btn.classList.contains('locked') : false;
 
       if (isLocked) {
-        option.disabled = true;
-        option.textContent += ` (${t('locked')})`;
+        li.classList.add('locked');
+        text += ` (${t('locked')})`;
       }
+
+      li.textContent = text;
+
+
+      li.onclick = function () {
+        if (!isLocked) {
+          display.textContent = text;
+          optionsList.classList.add('select-hide');
+          startPhase(id);
+        }
+      };
 
       if (id === currentPhase) {
-        option.selected = true;
+        display.textContent = text;
       }
 
-      select.appendChild(option);
+      optionsList.appendChild(li);
     }
+  }
 
-    select.onchange = function () {
-      const id = parseInt(this.value);
-      if (id && !document.getElementById(`phase-${id}-btn`)?.classList.contains('locked')) {
-        startPhase(id);
-      }
-    };
-  } else {
-    select.style.display = 'none';
+  display.onclick = function (e) {
+    e.stopPropagation();
+
+    optionsList.classList.toggle('select-hide');
+    display.classList.toggle('select-arrow-active');
+  };
+}
+
+
+window.onclick = function (event) {
+  if (!event.target.matches('.select-selected')) {
+    document.getElementById('mobile-phase-options')?.classList.add('select-hide');
   }
 }
 
 function adjustMobileGridPosition() {
-  if (window.innerWidth > 1024) return; // só mobile
+  if (window.innerWidth > 1024) return;
 
   const commandList = document.getElementById('command-list');
   const gridContainer = document.getElementById('game-container');
 
   if (commandList && gridContainer) {
-    const commandHeight = commandList.offsetHeight || 70; // fallback 70px
-    const newTop = commandHeight + 30; // + margem/padding confortável
+    const commandHeight = commandList.offsetHeight || 70;
+    const newTop = commandHeight + 30;
     gridContainer.style.top = `${newTop}px`;
 
-    // Ajusta padding-top da screen pra não cortar o conteúdo rolável
-    document.getElementById('game-screen').style.paddingTop = `${newTop + 370}px`; // 370px ≈ altura grid reduzido + margem
+    document.getElementById('game-screen').style.paddingTop = `${newTop + 370}px`;
   }
 }
-
 
 // Carrega progresso salvo 
 const savedProgress = localStorage.getItem('phaseProgress');

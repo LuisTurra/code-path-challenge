@@ -15,7 +15,7 @@
 
 <body>
 
-    <!-- Controls -->
+    <!-- Main Menu Controls -->
     <div id="top-controls">
         <button id="home-btn" onclick="showStartScreen()" title="Home">
             <i class="fas fa-home"></i>
@@ -25,22 +25,18 @@
         </button>
     </div>
 
+    <!-- Tutorial Modal -->
     <div id="tutorial-modal" class="modal">
-                <div class="modal-content">
-                                    <span class="close" onclick="closeTutorial()">&times;</span>
-                        <h3 data-i18n="how_to_play_title">How to Play</h3>
-                        <p data-i18n="tutorial_basic_text">Click direction buttons to build a command sequence. Cube
-                must stay on <strong>white
-                    path</strong> and
-                                reach <strong>B (red)</strong>. Hit "Start" to run!<br><br>Forward/back OK, but
-                <strong>no leaving
-                                        path</strong>!
-            </p>
-                                    <button onclick="closeTutorial()" class="green-btn" style="margin-top: 15px;"
-                data-i18n="got_it">Got
+            <div class="modal-content">
+                <span class="close" onclick="closeTutorial()">&times;</span>
+                    <h3 data-i18n="how_to_play_title">How to Play</h3>
+                <p data-i18n="tutorial_basic_text">Click direction buttons to build a command sequence.
+                Cube must stay on <strong>white path</strong> and reach <strong>B (red)</strong>.
+                Hit "Start" to run!<br><br>Forward/back OK, but <strong>no leaving path</strong>! </p>
+            <button onclick="closeTutorial()" class="green-btn" style="margin-top: 15px;" data-i18n="got_it">Got
                 It!</button>
-                    </div>
-            </div>
+        </div>
+    </div>
 
     <!-- Start Screen  -->
     <div id="start-screen" class="screen active">
@@ -55,6 +51,8 @@
             <button onclick="showPhaseSelection()" class="menu-btn green-btn" data-i18n="phases">phase</button>
             <button onclick="showGlobalRankings()" class="menu-btn green-btn" data-i18n="rankings">Rankings</button>
         </div>
+
+        <!-- Language Selector -->
         <div id="language-selector" style="margin-top: 30px; text-align: center; color: white;">
             <label for="language-select" style="margin-right: 10px; font-size: 1.2em;">Idioma / Language:</label>
             <select id="language-select"
@@ -63,6 +61,8 @@
                 <option value="pt">Português (BR)</option>
             </select>
         </div>
+
+        <!--Kofi-->
         <div id="kofi-support" style="margin-top: 30px; text-align: center;">
             <a href="https://ko-fi.com/luisturra" target="_blank"
                 style="display: inline-flex; align-items: center; gap: 12px; padding: 12px 24px; background: #00b9fe; color: white; border-radius: 12px; font-size: 1.2em; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
@@ -87,18 +87,15 @@
             <button onclick="showStartScreen()" class="green-btn" data-i18n="back_to_menu">Back to Menu</button>
         </div>
     </div>
-    <!-- Entry Name -->
 
+    <!-- Entry Name -->
     <div id="name-entry-modal">
         <div class="name-wrapper">
             <div class="name-content">
                 <h3><span data-i18n="phase">Phase</span> <span id="name-phase-num"></span> <span
                         data-i18n="completed">Completed!</span></h3>
-
                 <div id="name-stats" style="margin: 20px 0; font-size: 1.3em; line-height: 1.6;">
-
                 </div>
-
                 <div style="margin: 25px 0;">
                     <input type="text" id="player-name-input" placeholder="Enter your name" maxlength="15"
                         autocomplete="off" style="width: 100%; padding: 16px; font-size: 1.2em; 
@@ -107,7 +104,6 @@
                       text-align: center; outline: none;
                       box-shadow: 0 0 20px rgba(0,255,136,0.3);">
                 </div>
-
                 <div class="name-buttons">
                     <button onclick="submitPlayerName()" class="green-btn" data-i18n="submit_leaderboard">Submit to
                         Leaderboard</button>
@@ -119,9 +115,10 @@
             </div>
         </div>
     </div>
+
     <!-- Game Screen -->
     <div id="game-screen" class="screen">
-
+        <!-- Phases Navigation -->
         <div id="phase-nav">
             <button id="phase-1-btn" class="phase-btn active" onclick="startPhase(1)"><span
                     data-i18n="phase">Phase</span> 1</button>
@@ -154,8 +151,16 @@
                 <span class="locked-text" data-i18n="locked">LOCKED</span></button>
         </div>
 
-        <select id="mobile-phase-select" class="mobile-only"></select>
+        <!-- Mobile Phase Select -->
+        <div class="custom-select-container mobile-only">
+            <div id="mobile-phase-display" class="select-selected">
+                Selecionar Fase
+            </div>
+            <ul id="mobile-phase-options" class="select-items select-hide">
+            </ul>
+        </div>
         <div id="game-row">
+
             <!-- Grid -->
             <div class="grid-outer">
                 <div class="grid-inner">
@@ -171,7 +176,6 @@
             <!-- Controls Panel -->
             <div id="controls-panel">
                 <div id="controls">
-
                     <div class="dir-row"><button onclick="addCommand('up')" class="dir-btn" data-dir="up"><i
                                 class="fas fa-arrow-up"></i></button></div>
                     <div class="dir-row">
@@ -182,13 +186,11 @@
                     </div>
                     <div class="dir-row"><button onclick="addCommand('down')" class="dir-btn" data-dir="down"><i
                                 class="fas fa-arrow-down"></i></button></div>
-
                     <!-- Action buttons -->
                     <div class="action-row">
                         <button onclick="startGame()" id="start-btn" data-i18n="start_game">Start</button>
                         <button onclick="resetGame()" data-i18n="reset">Reset</button>
                     </div>
-
                     <div class="action-row" style="justify-content:center;">
                         <button onclick="addFunctionCommand()" id="function-btn" style="display:none;">F1</button>
                     </div>
@@ -196,11 +198,9 @@
                         <button onclick="addFunction2Command()" id="function2-btn" style="display:none;">F2</button>
                     </div>
                 </div>
-
-                <!-- Function Box -->
-
-
             </div>
+
+            <!-- Function 1 Box -->
             <div id="function-box" style="display:none;">
                 <div style="color:#ffaa00;font-weight:bold;margin-bottom:8px;">
                     <span data-i18n="function_f1">FUNCTION (F1):</span>
@@ -212,6 +212,8 @@
                     <span data-i18n="you_have_only">You have only</span> <span id="func-limit-number">4</span> <span
                         data-i18n="function_commands"> function commands</span>
                 </div>
+
+                <!-- Function 1 Commands -->
                 <div id="function-commands"><span style="color:#666">[]</span></div>
                 <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
                     <button onclick="addToFunction('up')" class="dir-btn small" data-dir="up"><i
@@ -227,8 +229,8 @@
                         F2
                     </button>
                 </div>
-
             </div>
+
             <!-- Function 2 Box -->
             <div id="function2-box" style="display:none;">
                 <div style="color:#ffaa00;font-weight:bold;margin-bottom:8px;">
@@ -241,6 +243,8 @@
                     You have only <span id="func2-limit-number">4</span> <span data-i18n="function_commands"> function
                         commands</span>
                 </div>
+
+                <!--Function 2 Commands-->
                 <div id="function2-commands"><span style="color:#666">[]</span></div>
                 <div style="margin-top:8px;display:flex;justify-content:center;gap:6px;">
                     <button onclick="addToFunction2('up')" class="dir-btn small" data-dir="up"><i
@@ -264,13 +268,10 @@
             <span data-i18n="you_have_only">You have only</span> <span id="limit-number">4</span> <span
                 data-i18n="main_commands"> main commands – use FUNCTION (F) wisely!</span>
         </div>
-
         <div id="command-list"></div>
 
-
-
-        <!-- Result -->
-        <!-- RESULT MODAL - PHASE COMPLETE -->
+        
+        <!-- Phase Complete -->
         <div id="result-modal">
             <div class="result-wrapper">
                 <div class="result-content">
@@ -286,6 +287,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Button Ranking -->
         <div class="button-container">
             <button onclick="showRanking(currentPhase || 1)" class="green-btn">
@@ -297,34 +299,23 @@
             </button>
         </div>
 
-        <!-- RANKING MODAL (for single phase) -->
+        <!-- Single phase results-->
         <div id="ranking-modal" class="modal" style="display:none;">
             <div class="modal-content">
                 <span class="close" onclick="closeRankingModal()">×</span>
-                <div class="scroll-area"> <!-- ← ADD THIS WRAPPER -->
+                <div class="scroll-area">
                     <h2 id="ranking-title" style="text-align:center; margin-top:0;">Phase 1 Ranking</h2>
                     <div id="ranking-list"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Phase Selection -->
-        <!-- <div id="phase-selection-modal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closePhaseSelection()">&times;</span>
-                <h2>Select Phase</h2>
-                <div id="phase-selection-buttons">
-                </div>
-                <button onclick="closePhaseSelection()" class="green-btn">Back to Menu</button>
-            </div>
-        </div> -->
-
         <!-- Firebase -->
         <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
         <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
         <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
-
+        <!-- Firebase Initialization (fake) -->
         <script type="module">
             let firebaseConfig = {
                 apiKey: "fake-key-so-erro-nao-quebra",
