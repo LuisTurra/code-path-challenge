@@ -53,23 +53,21 @@
         </div>
 
         <!-- Language Selector -->
-        <div id="language-selector" style="margin-top: 30px; text-align: center; color: white;">
-            <label for="language-select" style="margin-right: 10px; font-size: 1.2em;">Idioma / Language:</label>
-            <select id="language-select"
-                style="padding: 10px; font-size: 1.1em; border-radius: 8px; border: 2px solid #00ff88; background: #001a0d; color: white;">
+        <div id="language-selector">
+            <label for="language-select">Idioma / Language:</label>
+            <select id="language-select">
                 <option value="en">English</option>
                 <option value="pt">Português (BR)</option>
             </select>
         </div>
 
-        <!--Kofi-->
-        <div id="kofi-support" style="margin-top: 30px; text-align: center;">
-            <a href="https://ko-fi.com/luisturra" target="_blank"
-                style="display: inline-flex; align-items: center; gap: 12px; padding: 12px 24px; background: #00b9fe; color: white; border-radius: 12px; font-size: 1.2em; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-                <img src="https://storage.ko-fi.com/cdn/kofi2.png" alt="Ko-fi" style="height: 36px; border: 0;">
+        <!-- Ko-fi -->
+        <div id="kofi-support">
+            <a href="https://ko-fi.com/luisturra" target="_blank" class="kofi-link">
+                <img src="https://storage.ko-fi.com/cdn/kofi2.png" alt="Ko-fi">
                 <span data-i18n="kofi_button">Apoie no Ko-fi ☕</span>
             </a>
-            <p style="margin-top: 12px; font-size: 0.95em; color: #ccc;" data-i18n="kofi_message">
+            <p data-i18n="kofi_message">
                 Se você gostou do jogo e puder apoiar o desenvolvimento, considere comprar um café virtual! (Totalmente
                 opcional ❤️)
             </p>
@@ -81,8 +79,9 @@
         <div class="modal-content">
             <span class="close" onclick="closePhaseSelection()">&times;</span>
             <h2 data-i18n="select_phase">Select Phase</h2>
-            <div id="phase-selection-buttons">
-
+            <div class="phases-list-scroll">
+                <div id="phase-selection-buttons">
+                </div>
             </div>
             <button onclick="showStartScreen()" class="green-btn" data-i18n="back_to_menu">Back to Menu</button>
         </div>
@@ -270,7 +269,7 @@
         </div>
         <div id="command-list"></div>
 
-        
+
         <!-- Phase Complete -->
         <div id="result-modal">
             <div class="result-wrapper">

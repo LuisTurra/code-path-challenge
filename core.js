@@ -1,3 +1,4 @@
+// ==== Global Variables ====
 const gridSize = 6;
 let commands = [];
 let functionCommands = [];
@@ -15,10 +16,10 @@ const RATIO_FONT = 24 / 64;
 const RATIO_RADIUS = 14 / 64;
 let alignmentOffset = 0;
 
-// ==== SISTEMA DE TRADUÇÃO ====
+// ==== Translations ====
 let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('pt') ? 'pt' : 'en');
-
 const translations = {
+  // === English ===
   en: {
     title: "Code Path Challenge",
     subtitle: "Guide the cube from A to B using direction commands!",
@@ -89,7 +90,7 @@ const translations = {
 `
 
   },
-
+// === Portuguese ===
   pt: {
     title: "Desafio Caminho do Código",
     subtitle: "Guie o cubo do ponto A até o ponto B usando os commandos direcionais!",
@@ -160,15 +161,14 @@ const translations = {
 `
   }
 };
-
+// ==== Translation Functions ====
 function t(key) {
   return translations[currentLang][key] || translations.en[key] || key;
 }
-
 function format(str, ...args) {
   return str.replace(/\{(\d+)\}/g, (_, i) => args[i] || '');
 }
-
+// ==== UI Update Functions ====
 function updateTexts() {
   document.title = t('title');
   document.documentElement.lang = currentLang === 'pt' ? 'pt-BR' : 'en';
@@ -180,24 +180,26 @@ function updateTexts() {
 
   const input = document.getElementById('player-name-input');
   if (input) input.placeholder = t('enter_name_placeholder');
-
+  
   const homeBtn = document.getElementById('home-btn');
   if (homeBtn) homeBtn.title = t('home_title');
+  
   const tutorialBtn = document.getElementById('tutorial-btn');
   if (tutorialBtn) tutorialBtn.title = t('tutorial_title');
-
-
+  
   const startBtn = document.getElementById('start-btn');
   if (startBtn && !isAnimating) startBtn.textContent = t('start_game');
 }
 
 // ===================================
 
+// ==== Core Game Functions ====
 function getCellSize() {
   const cell = document.querySelector('.grid-cell');
   return cell ? cell.offsetWidth : 64;
 }
 
+// Show the start screen and hide the game screen
 function showStartScreen() {
   document.getElementById('start-screen').classList.add('active');
   document.getElementById('game-screen').classList.remove('active');
@@ -207,6 +209,7 @@ function showStartScreen() {
   updateMobilePhaseSelect()
 }
 
+// Start a phase by its ID
 function startPhase(id) {
   if (id !== 1 && !phaseProgress.unlocked.includes(id)) return;
   phaseProgress.current = id;
@@ -222,7 +225,6 @@ function startPhase(id) {
   initPhase(id);
   updateTexts();
   updateRecursiveButtonsVisibility();
-
   adjustMobileGridPosition();
   if (id === 1) showBasicTutorial();
   else if (id === 3) showPhase3Tutorial();
@@ -231,11 +233,13 @@ function startPhase(id) {
   updateMobilePhaseSelect();
 }
 
+// Show the rankings modal
 function closeRankingModal() {
   document.getElementById('ranking-modal').style.display = 'none';
   document.getElementById('result-modal').style.display = 'none';
 }
 
+// Show the rankings modal
 function initPhase(id) {
   const phase = phases.find(p => p.id === id);
   currentPathCoords = phase.coords;
@@ -246,7 +250,6 @@ function initPhase(id) {
   function2CommandLimit = phase.function2CommandLimit || Infinity;
   const hasFunc = !!phase.hasFunction;
   const hasFunc2 = !!phase.hasFunction2;
-
   const limitText = document.getElementById('command-limit-text');
   const limitNum = document.getElementById('limit-number');
   const funclimitText = document.getElementById('func-limit-text');
@@ -291,6 +294,7 @@ function initPhase(id) {
 
 }
 
+// Reposition the cube, start point, and end point based on the current grid and ratios
 function repositionElements() {
   const cellSize = getCellSize();
   const cube = document.getElementById('cube');
@@ -301,7 +305,7 @@ function repositionElements() {
 
   let innerSize, fontSize, radius, finalOffset;
 
-  // 1. MOBILE
+  // === MOBILE/SMALL SCREENS ===
   if (window.innerWidth <= 1024) {
     innerSize = 45;
     finalOffset = 16;
@@ -325,10 +329,10 @@ function repositionElements() {
       radius = 4;
     }
 
-    alignmentOffset = finalOffset;  // <--- AQUI
+    alignmentOffset = finalOffset;  
 
   } else {
-    // 2. DESKTOP
+    // === DESKTOP/LARGER SCREENS ===
     innerSize = cellSize * RATIO_INNER;
     fontSize = cellSize * RATIO_FONT;
     radius = cellSize * RATIO_RADIUS;
@@ -339,7 +343,7 @@ function repositionElements() {
     const centering = (cellSize - innerSize) / 2;
     finalOffset = containerPadding + gridBorder + centering;
 
-    alignmentOffset = finalOffset;  // <--- AQUI
+    alignmentOffset = finalOffset; 
   }
 
   const apply = (el, pos) => {
@@ -360,7 +364,7 @@ function repositionElements() {
   apply(endPoint, endPos);
 }
 
-
+// === Initialize the game grid and elements for the current phase
 function initGame() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
@@ -381,10 +385,9 @@ function initGame() {
   resetCommands();
 }
 
+// === Reset the grid and reposition elements (used when resizing or resetting)
 function resetGridAndReposition() {
   if (!document.getElementById('game-screen').classList.contains('active')) return;
-
-  // Recria o grid (limpa células)
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
   for (let y = 0; y < gridSize; y++) {
@@ -396,16 +399,13 @@ function resetGridAndReposition() {
       grid.appendChild(cell);
     }
   }
-
-  // Reaplica path
   currentPathCoords.forEach(p => {
     document.querySelector(`.grid-cell[data-x="${p.x}"][data-y="${p.y}"]`).classList.add('path');
   });
-
-  // Reposiciona tudo com ratios originais
   repositionElements();
 }
 
+// === Reset commands and update displays ===
 function resetCommands() {
   commands = [];
   functionCommands = [];
@@ -422,6 +422,7 @@ function resetCommands() {
   adjustMobileGridPosition();
 }
 
+// === Add a main command and update display ===
 function addCommand(dir) {
   if (isAnimating) return;
   if (commands.length >= mainCommandLimit) {
@@ -432,6 +433,7 @@ function addCommand(dir) {
   updateCommandDisplay();
 }
 
+//=== Add a FUNCTION (F) command and update display ===
 function addFunctionCommand() {
   if (isAnimating) return;
   if (commands.length >= mainCommandLimit) {
@@ -442,6 +444,7 @@ function addFunctionCommand() {
   updateCommandDisplay();
 }
 
+//=== Add a FUNCTION 2 (F2) command and update display ===
 function addFunction2Command() {
   if (isAnimating) return;
   if (commands.length >= mainCommandLimit) {
@@ -452,6 +455,7 @@ function addFunction2Command() {
   updateCommandDisplay();
 }
 
+//=== Add a command to the FUNCTION box and update display ===
 function addToFunction(dir) {
   if (isAnimating) return;
   if (dir === 'F2' && currentPhase < 7) return;
@@ -463,6 +467,7 @@ function addToFunction(dir) {
   updateFunctionDisplay();
 }
 
+//=== Add a command to the FUNCTION 2 box and update display ===
 function addToFunction2(dir) {
   if (isAnimating) return;
   if (dir === 'F' && currentPhase < 7) return;
@@ -474,16 +479,19 @@ function addToFunction2(dir) {
   updateFunctionDisplay();
 }
 
+//=== Clear FUNCTION and update display ===
 function clearFunction() {
   functionCommands = [];
   updateFunctionDisplay();
 }
 
+//=== Clear FUNCTION 2 and update display ===
 function clearFunction2() {
   function2Commands = [];
   updateFunctionDisplay();
 }
 
+//=== Update the main command display with icons ===
 function updateCommandDisplay() {
   const list = document.getElementById('command-list');
   list.innerHTML = '';
@@ -512,6 +520,7 @@ function updateCommandDisplay() {
   adjustMobileGridPosition();
 }
 
+///== Update the FUNCTION and FUNCTION 2 displays with icons ===
 function updateFunctionDisplay() {
   const box = document.getElementById('function-commands');
   if (functionCommands.length === 0) {
@@ -550,11 +559,13 @@ function updateFunctionDisplay() {
   }
 }
 
+//=== Get the corresponding icon HTML for a direction command ===
 function getDirectionIcon(d) {
   const icons = { 'up': '<i class="fas fa-arrow-up"></i>', 'down': '<i class="fas fa-arrow-down"></i>', 'left': '<i class="fas fa-arrow-left"></i>', 'right': '<i class="fas fa-arrow-right"></i>' };
   return icons[d] || '';
 }
 
+//=== Execute the command sequence and animate the cube ===
 function startGame() {
   if (commands.length === 0 || isAnimating) return;
   isAnimating = true;
@@ -643,6 +654,7 @@ function startGame() {
   exec();
 }
 
+//=== Update visibility of FUNCTION buttons based on current phase ===
 function updateRecursiveButtonsVisibility() {
   const show = currentPhase >= 7;
   document.querySelectorAll('.recursive-call-btn').forEach(btn => {
@@ -650,6 +662,7 @@ function updateRecursiveButtonsVisibility() {
   });
 }
 
+//=== Check if the cube reached the end position and show win/fail accordingly ===
 function checkWin(p) {
   if (p.x === endPos.x && p.y === endPos.y) showWin();
   else showFail(t('not_reach_b'));
@@ -657,6 +670,7 @@ function checkWin(p) {
 
 let currentPhaseData = {};
 
+//=== Show the win modal with stats and leaderboard submission ===
 function showWin() {
   isAnimating = false;
   const timeTaken = ((Date.now() - gameStartTime) / 1000).toFixed(1);
@@ -703,7 +717,7 @@ function showWin() {
   updateTexts();
 }
 
-
+//=== Handle player name submission, validate, save to leaderboard, and close modal ===
 function submitPlayerName() {
   let playerName = document.getElementById('player-name-input').value.trim();
 
@@ -734,6 +748,7 @@ function submitPlayerName() {
   closeNameModal();
 }
 
+//=== Check if the name contains any inappropriate words ===
 function containsBadWord(name) {
   const lowered = name.toLowerCase();
   const badWords = [
@@ -749,10 +764,12 @@ function containsBadWord(name) {
   return badWords.some(word => lowered.includes(word));
 }
 
+
 function closeNameModal() {
   document.getElementById('name-entry-modal').style.display = 'none';
 }
 
+//=== Shows if fail the phase ===
 function showFail(msg) {
   isAnimating = false;
   document.getElementById('result-title').textContent = t('failed');
@@ -762,6 +779,7 @@ function showFail(msg) {
   const startBtn = document.getElementById('start-btn');
   if (startBtn) startBtn.textContent = t('start_game');
 }
+
 
 function nextPhase() {
   closeModal();

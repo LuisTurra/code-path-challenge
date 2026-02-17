@@ -6,6 +6,7 @@
     padding: 0;
 }
 
+/* Base Styles */
 html,
 body {
     height: 100dvh;
@@ -15,6 +16,7 @@ body {
     color: #fff;
 }
 
+/* ──── Global Elements ──── */
 #top-controls {
     position: fixed;
     top: 15px;
@@ -25,6 +27,7 @@ body {
     z-index: 1000;
 }
 
+/* Home and Tutorial buttons */
 #home-btn,
 #tutorial-btn {
     background: #003087;
@@ -45,6 +48,7 @@ body {
     transform: scale(1.1);
 }
 
+/* ──────────────────────────────────────────────────────── */
 .screen {
     display: flex;
     flex-direction: column;
@@ -59,6 +63,7 @@ body {
     display: none !important;
 }
 
+/* ──── Start Screen ──── */
 #start-screen {
     background: linear-gradient(135deg, #2a2a2a, #003087);
     padding: 40px 30px;
@@ -183,7 +188,7 @@ button[onclick="resetGame()"]:hover,
 }
 
 /* ──────────────────────────────────────────────────────── */
-
+/* ──── Phase Selection Buttons ──── */
 .phase-btn {
     background: #003087;
     padding: 10px 20px;
@@ -210,6 +215,7 @@ button[onclick="resetGame()"]:hover,
     opacity: .7;
 }
 
+/* ──────────────────────────────────────────────────────── */
 #game-row {
     display: flex;
     gap: 20px;
@@ -230,6 +236,7 @@ button[onclick="resetGame()"]:hover,
     border-radius: 20px;
 }
 
+/* Grid Container */
 #grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -265,20 +272,17 @@ button[onclick="resetGame()"]:hover,
     transform: scale(.95);
 }
 
+/* ──────────────────────────────────────────────────────── */
+/* Player, Start and End Points */
 #cube {
-    /* z-index: 20; */
     background: linear-gradient(45deg, #003087, #0050b3);
     border: 4px solid #fff;
-    /* border-radius: 14px; */
-    /* position: absolute; */
-
     transition: left .4s cubic-bezier(.4, 0, .2, 1),
         top .4s cubic-bezier(.4, 0, .2, 1);
-    /* box-shadow: 0 10px 30px rgba(0, 48, 135, .8); */
 }
 
+/* Moving cube */
 .point {
-
     display: flex;
     align-items: center;
     justify-content: center;
@@ -290,6 +294,7 @@ button[onclick="resetGame()"]:hover,
     box-shadow: 0 10px 30px rgba(0, 0, 0, .6);
 }
 
+/* Start and End points */
 #start-point {
     background: linear-gradient(45deg, #00cc00, #00ff00);
     position: absolute;
@@ -300,6 +305,7 @@ button[onclick="resetGame()"]:hover,
     position: absolute;
 }
 
+/* ──────────────────────────────────────────────────────── */
 #controls-panel {
     display: flex;
     flex-direction: column;
@@ -315,6 +321,7 @@ button[onclick="resetGame()"]:hover,
     gap: 8px;
 }
 
+/* Directional buttons */
 .dir-row {
     display: flex;
     justify-content: center;
@@ -347,6 +354,7 @@ button[onclick="resetGame()"]:hover,
     font-size: 18px;
 }
 
+/* Action buttons (Reset, Next Phase) */
 .action-row {
     display: flex;
     gap: 12px;
@@ -362,6 +370,7 @@ button[onclick="resetGame()"]:hover,
     margin: 30px 0;
 }
 
+/* Menu buttons (Start, Phase Select, Rankings) */
 .menu-btn {
     background: linear-gradient(45deg, #00cc00, #00ff00);
     color: #000;
@@ -382,6 +391,7 @@ button[onclick="resetGame()"]:hover,
     box-shadow: 0 12px 30px rgba(0, 204, 0, 0.7);
 }
 
+/* Function buttons and command display */
 #function-btn,
 #function2-btn {
     background: linear-gradient(45deg, #ff6b00, #ffaa00) !important;
@@ -413,6 +423,7 @@ button[onclick="resetGame()"]:hover,
     border-radius: 8px;
 }
 
+/* Command icons inside the function boxes */
 #command-list {
     min-height: 50px;
     max-height: 150px;
@@ -432,6 +443,7 @@ button[onclick="resetGame()"]:hover,
     overflow: hidden;
 }
 
+/* Command icons */
 .cmd-icon {
     width: 32px;
     height: 32px;
@@ -450,10 +462,7 @@ button[onclick="resetGame()"]:hover,
 }
 
 /* ──────────────────────────────────────────────────────── */
-
-
-/* ──── Result Modal (Final, Cleaned Version) ──── */
-
+/* ──── Result Modal ──── */
 @keyframes popIn {
     0% {
         transform: scale(0.6);
@@ -469,7 +478,7 @@ button[onclick="resetGame()"]:hover,
         opacity: 1;
     }
 }
-
+/* Result Modal Styles */
 #result-modal {
     position: fixed;
     top: 0;
@@ -519,7 +528,7 @@ button[onclick="resetGame()"]:hover,
     text-shadow: 0 0 20px rgba(0, 255, 136, 0.7);
     font-weight: 800;
 }
-
+/* Container for the buttons on the result screen */
 .result-buttons {
     display: flex;
     gap: 18px;
@@ -611,7 +620,7 @@ button[onclick="resetGame()"]:hover,
 /* ──────────────────────────────────────────────────────── */
 
 
-/* ──── Start Screen Components ──── */
+/* ──── Start Screen Phase Buttons ──── */
 #start-background {
     position: absolute;
     top: 0;
@@ -672,7 +681,7 @@ button[onclick="resetGame()"]:hover,
 }
 
 /* ──────────────────────────────────────────────────────── */
-/* ─────── FINAL RANKING MODALS – PERFECT SCROLL + ALWAYS VISIBLE CLOSE ─────── */
+/* ──── Rankings Modal ──── */
 
 #ranking-modal,
 #global-rank-container {
@@ -681,11 +690,10 @@ button[onclick="resetGame()"]:hover,
     justify-content: center;
 }
 
-
+/* Base Modal Content for Rankings */
 #ranking-modal .modal-content,
 #global-rank-container .modal-content {
     position: relative;
-    /* background: #001a0d ; */
     border: 3px solid #00ff88;
     border-radius: 20px;
     width: 92%;
@@ -693,7 +701,6 @@ button[onclick="resetGame()"]:hover,
     max-height: 90vh;
     padding: 0;
     overflow: hidden;
-    /* box-shadow: 0 0 30px rgba(0, 255, 136, 0.6); */
 }
 
 
@@ -718,7 +725,7 @@ button[onclick="resetGame()"]:hover,
     border: 3px solid #001a0d;
 }
 
-/* Close button – always on top */
+/* Close button */
 #ranking-modal .close,
 #global-rank-container .close {
     color: #00ff88;
@@ -732,7 +739,7 @@ button[onclick="resetGame()"]:hover,
     text-shadow: 0 0 15px #00ff88;
 }
 
-
+/* Ranking tables */
 #ranking-list,
 #global-ranking-list {
     width: 100%;
@@ -752,6 +759,7 @@ button[onclick="resetGame()"]:hover,
     letter-spacing: 1px;
 }
 
+/* Phase selector dropdown */
 .phase-select {
     display: block;
     margin: 0 auto 24px;
@@ -772,7 +780,7 @@ button[onclick="resetGame()"]:hover,
     outline: none;
 }
 
-/* Table Styling */
+/* Ranking Table Styles */
 .ranking-table {
     width: 100%;
     border-collapse: collapse;
@@ -832,7 +840,6 @@ button[onclick="resetGame()"]:hover,
     transition: all 0.3s;
 }
 
-/* Rank Coloring */
 .ranking-table td:first-child {
     font-weight: 900;
     width: 70px;
@@ -862,10 +869,12 @@ button[onclick="resetGame()"]:hover,
     font-weight: 700;
 }
 
+/* Effect for the player's rank box */
 #your-rank-box {
     animation: pulseGlow 2s infinite alternate;
 }
 
+/* Keyframes for the pulsing glow effect on the player's rank box */
 @keyframes pulseGlow {
     from {
         box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
@@ -876,6 +885,7 @@ button[onclick="resetGame()"]:hover,
     }
 }
 
+/* Text styles for loading, no records, and error messages */
 .loading-text {
     color: #58a6ff;
     font-weight: bold;
@@ -891,21 +901,16 @@ button[onclick="resetGame()"]:hover,
     font-weight: bold;
 }
 
-/* Esconde o texto "LOCKED" por padrão */
+/* hide the "Locked" text by default */
 .phase-btn .locked-text {
     display: none;
 }
 
-/* Mostra o texto só quando o botão tem a classe 'locked' */
 .phase-btn.locked .locked-text {
     display: inline;
 }
 
-
-
-
-
-/* FORÇA TOTAL phase-nav NO DESKTOP */
+/* Adjustments for the phase selection screen */
 #phase-nav {
     display: flex !important;
     visibility: visible !important;
@@ -915,20 +920,172 @@ button[onclick="resetGame()"]:hover,
     z-index: auto !important;
 }
 
+.phases-list-scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    margin: 20px 0 30px 0;
+    padding: 0 10px;
+}
+
+/* Glowing green scrollbar for phase selection */
+#phase-selection-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    padding: 10px 0;
+    justify-items: center;
+}
+
+/* Custom scrollbar for phase selection */
+#phase-selection-buttons button.menu-btn,
+#phase-selection-buttons button.green-btn {
+    width: 100%;
+    max-width: 280px;
+    padding: 16px 24px;
+    font-size: 1.1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+}
+
+/* Image styles for phase selection buttons */
+#phase-selection-buttons img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 8px;
+}
+
+/* Container for the buttons on the phase selection screen */
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin: 20px auto;
+    max-width: 90vw;
+    padding: 0 10px;
+}
+
+.button-container .green-btn {
+    min-width: 180px;
+    padding: 14px 24px;
+    font-size: 1.05rem;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ______________________________________________*/
+/* Language selector styles */
+#language-selector {
+    margin: 25px 0 30px;
+    text-align: center;
+    color: white;
+}
+
+#language-selector label {
+    margin-right: 12px;
+    font-size: 1.15em;
+    font-weight: 500;
+}
+
+#language-selector select {
+    padding: 9px 14px;
+    font-size: 1.05em;
+    border-radius: 8px;
+    border: 2px solid #00ff88;
+    background: #001a0d;
+    color: white;
+    cursor: pointer;
+    min-width: 180px;
+}
+
+/* Kofi support button styles */
+#kofi-support {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.kofi-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 22px;
+    background: #00b9fe;
+    color: white;
+    border-radius: 12px;
+    font-size: 1.05em;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+}
+
+.kofi-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+}
+
+.kofi-link img {
+    height: 28px;
+    border: 0;
+}
+
+#kofi-support p {
+    margin-top: 10px;
+    font-size: 0.92em;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+/* Adjustments for the start screen text */
+#start-screen h1,
+#start-screen p {
+    text-align: center;
+    width: 100%;
+    max-width: 90vw;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Title */
+#start-screen h1 {
+    font-size: 2.8em;
+    margin: 0 auto 12px;
+    line-height: 1.1;
+}
+
+/* Description text */
+#start-screen p {
+    font-size: 1.1em;
+    margin: 0 auto 20px;
+    max-width: 80vw;
+    opacity: 0.9;
+}
+
 /* ──────────────────────────────────────────────────────── */
-
-
-
-
-
 /* ──── Media Queries ──── */
-@media (min-width: 1025px) {
-    .mobile-only {
-        display: none !important;
+
+@media (max-width: 380px) {
+    /*Reduce button sizes and font*/
+    .button-container .green-btn {
+        font-size: 0.95rem;
+        padding: 12px 18px;
+    }
+}
+
+@media (max-width: 399px) {
+    /* Reduce main game container size */
+    #game-container {
+        width: 300px !important;
     }
 }
 
 @media (max-width: 480px) {
+    /* Adjust directional buttons and controls panel */
     .dir-btn {
         width: 48px;
         height: 48px;
@@ -946,37 +1103,147 @@ button[onclick="resetGame()"]:hover,
     }
 }
 
-/* Pequeno: telas estreitas (~320px width, ex: celular portrait ou landscape pequeno) */
-@media (max-width: 399px) {
-    #game-container {
-        width: 300px !important;
-        /* cellSize ~50px */
-    }
-}
-
-/* Médio: 400-799px (maioria dos celulares landscape) */
 @media (min-width: 400px) and (max-width: 799px) {
+    /* Adjust main game container size for medium screens */
     #game-container {
         width: 340px !important;
-        /* cellSize ~56.6px */
     }
 }
 
-/* Grande: 800+ (tablets ou celulares grandes landscape) */
+@media (max-width: 500px) {
+    /* Stack phase selection buttons in a single column on small screens */
+    #phase-selection-buttons {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    #phase-selection-buttons button {
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 501px) and (max-width: 990px) {
+    /* Adjust phase selection buttons to 2 columns for medium screens */
+    #phase-selection-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    /* Adjustments for the start screen on small screens */
+    #start-screen {
+        padding: 16px 12px 80px 12px;
+        gap: 8px;
+        justify-content: flex-start;
+        min-height: 100dvh;
+    }
+    /* Adjust title and description text for better readability on small screens */
+    #start-screen h1 {
+        font-size: 1.95rem;
+        margin: 0 0 6px;
+        line-height: 1.05;
+    }
+    /* Adjust description text for better readability on small screens */
+    #start-screen p {
+        font-size: 0.92rem;
+        margin: 0 0 14px;
+        line-height: 1.3;
+    }
+    /* Stack menu buttons vertically and adjust spacing for small screens */
+    .menu-buttons-stack {
+        gap: 10px;
+        margin: 12px 0 16px;
+    }
+    /* Adjust menu button sizes for better fit on small screens */
+    .menu-btn {
+        padding: 12px 28px;
+        font-size: 1rem;
+        min-width: 200px;
+        max-width: 92vw;
+        border-radius: 10px;
+    }
+    /* Adjust language selector styles for better fit on small screens */
+    #language-selector {
+        margin: 10px 0 14px;
+    }
+
+    #language-selector label {
+        font-size: 0.98em;
+        margin-right: 8px;
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    #language-selector select {
+        padding: 7px 10px;
+        font-size: 0.95rem;
+        width: 100%;
+        max-width: 240px;
+    }
+    /* Adjust Kofi support button styles for better fit on small screens */
+    #kofi-support {
+        margin-top: 12px;
+    }
+
+    .kofi-link {
+        padding: 8px 16px;
+        font-size: 0.92em;
+        gap: 8px;
+    }
+
+    .kofi-link img {
+        height: 24px;
+    }
+
+
+    #kofi-support p {
+        margin-top: 6px;
+        font-size: 0.78em;
+        line-height: 1.3;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Adjustments for the start screen on small screens */
+    #start-screen h1 {
+        font-size: 2.1rem;
+        margin: 0 auto 8px;
+    }
+
+    #start-screen p {
+        font-size: 1rem;
+        margin: 0 auto 16px;
+        max-width: 85vw;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Stack phase selection buttons vertically and adjust spacing for small screens */
+    .button-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        margin: 16px auto;
+        padding: 0 8px;
+    }
+
+    .button-container .green-btn {
+        width: 100%;
+        max-width: 320px;
+        padding: 13px 20px;
+        font-size: 1rem;
+    }
+}
+
 @media (min-width: 800px) {
+    /* Adjust main game container size for larger screens */
     #game-container {
         width: 400px !important;
-        /* cellSize ~66.6px, mas capped pra não explodir */
     }
 }
 
-
-
-
-
-/* ======= MOBILE ÚNICO E LIMPO (tudo consolidado, sem duplicatas) ======= */
 @media (max-width: 1024px) {
-
+    /* Adjustments for the game screen */
     html,
     body {
         height: auto !important;
@@ -989,14 +1256,12 @@ button[onclick="resetGame()"]:hover,
         height: auto !important;
         min-height: 100dvh;
         padding: 20px 10px 150px 10px !important;
-        /* espaço embaixo pra rolar */
     }
-
-    /* Esconde phase-nav e mostra dropdown */
+    /* Hide the default phase navigation and show a custom dropdown for phase selection on smaller screens */
     #phase-nav {
         display: none !important;
     }
-
+    /* Custom dropdown for phase selection on smaller screens */
     #mobile-phase-select {
         display: block !important;
         margin: 15px auto;
@@ -1013,8 +1278,7 @@ button[onclick="resetGame()"]:hover,
 
 
     }
-
-    /* Lista de comandos flutuante + icons compactos */
+    /* Adjustments for the command list and game container on smaller screens */
     #command-list {
         position: fixed !important;
         top: 10px !important;
@@ -1046,8 +1310,7 @@ button[onclick="resetGame()"]:hover,
         height: 28px !important;
         font-size: 14px !important;
     }
-
-    /* Grid flutuante */
+    /* Adjustments for the game container*/
     #game-container {
         position: fixed !important;
         top: 85px !important;
@@ -1061,18 +1324,17 @@ button[onclick="resetGame()"]:hover,
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
         padding: 8px !important;
     }
-
+    /* Adjustments for the grid and controls*/
     #grid {
         padding: 0 !important;
         gap: 0 !important;
         border-width: 6px !important;
     }
-
+    /* Adjustments for the grid cells */
     .grid-cell {
         border-width: 3px !important;
     }
-
-    /* Botões home/tutorial embaixo */
+    /* Adjustments for the top controls (home, tutorial, directional buttons) */
     #top-controls {
         top: auto !important;
         bottom: 20px !important;
@@ -1089,7 +1351,6 @@ button[onclick="resetGame()"]:hover,
         font-size: 20px !important;
     }
 
-    /* Botões de direção maiores */
     .dir-btn {
         width: 70px !important;
         height: 70px !important;
@@ -1102,7 +1363,6 @@ button[onclick="resetGame()"]:hover,
         font-size: 30px !important;
     }
 
-    /* Padding da game-screen */
     #game-screen {
         padding-top: 450px !important;
     }
@@ -1113,7 +1373,7 @@ button[onclick="resetGame()"]:hover,
         width: min(90vw, 400px);
         font-family: sans-serif;
     }
-
+    /* Custom select styles */
     .select-selected {
         background-color: #003087;
         color: #fff;
@@ -1139,15 +1399,10 @@ button[onclick="resetGame()"]:hover,
         margin: 0;
         padding: 0;
         list-style: none;
-
-        /* AQUI ESTÁ A MÁGICA DA ROLAGEM */
         max-height: 250px;
-        /* Altura máxima da lista */
         overflow-y: auto;
-        /* Habilita rolagem vertical */
     }
 
-    /* Customizando a barra de rolagem (Scrollbar) */
     .select-items::-webkit-scrollbar {
         width: 8px;
     }
@@ -1178,15 +1433,11 @@ button[onclick="resetGame()"]:hover,
         display: none;
     }
 
-    /* Container precisa de um ajuste para posicionar a seta */
     .select-selected {
         position: relative;
-        /* Base para a seta */
         padding-right: 40px;
-        /* Espaço para a seta não sobrepor o texto */
     }
 
-    /* Criando a seta com CSS */
     .select-selected::after {
         content: "";
         position: absolute;
@@ -1198,14 +1449,28 @@ button[onclick="resetGame()"]:hover,
         border-left: 6px solid transparent;
         border-right: 6px solid transparent;
         border-top: 7px solid #ffffff;
-        /* Cor da seta */
         transition: transform 0.3s ease;
-        /* Animação suave */
     }
 
-    /* Rotaciona a seta quando o menu estiver aberto */
     .select-selected.select-arrow-active::after {
         transform: translateY(-50%) rotate(180deg);
     }
 
 }
+
+@media (min-width: 1025px) {
+    /* Show the default phase navigation and hide the custom dropdown for larger screens */
+    .mobile-only {
+        display: none !important;
+    }
+}
+
+@media (min-width: 1100px) {
+    /* Adjustments for the phase selection screen*/
+    #phase-selection-buttons {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        max-width: 900px;
+        margin: 0 auto;
+    }
+}
+
